@@ -1,74 +1,124 @@
-<?php $featuredCount = is_array($properties ?? null) ? count($properties) : 0; ?>
+<?php
+$page = (int) ($page ?? 1);
+$perPage = (int) ($perPage ?? 12);
+$totalPages = (int) ($totalPages ?? 1);
+$totalFeatured = (int) ($totalFeatured ?? (is_array($properties ?? null) ? count($properties) : 0));
+$visibleCount = is_array($properties ?? null) ? count($properties) : 0;
+$rangeStart = $totalFeatured > 0 ? (($page - 1) * $perPage) + 1 : 0;
+$rangeEnd = $totalFeatured > 0 ? min($totalFeatured, $rangeStart + $visibleCount - 1) : 0;
+$buildPageUrl = static function (int $targetPage): string {
+    return DIRPAGE . 'featured?page=' . $targetPage;
+};
+$featuredCount = $totalFeatured;
+$discoveryPersonalized = !empty($discoveryPersonalized) || !empty($data['discoveryPersonalized']);
+$continueExploring = isset($continueExploring) && is_array($continueExploring)
+    ? $continueExploring
+    : (($data['continueExploring'] ?? []) ?: []);
+$partialGridCard = DIRREQ . 'app/view/partials/property_grid_card.php';
+$partialCarouselCard = DIRREQ . 'app/view/partials/property_carousel_card.php';
+$typeLabels = Src\classes\PropertyTypeHelper::getTypeLabels();
+$formatType = static function (?string $value) use ($typeLabels): string {
+    return $typeLabels[$value ?? ''] ?? 'Tipo nao definido';
+};
+$purposeLabels = [
+    'venda' => 'Venda',
+    'aluguer_curto' => 'Aluguer curto',
+    'aluguer_longo' => 'Aluguer longo',
+];
+$formatPurpose = static function (?string $value) use ($purposeLabels): string {
+    return $purposeLabels[$value ?? ''] ?? 'Finalidade nao definida';
+};
+?>
+
+<div class="featured-page-view">
 
 <section class="container sales-page-head featured-page-head">
     <div class="sales-head-copy">
-        <span class="sales-kicker">Selecao premium</span>
-        <h1>Imoveis em Destaque</h1>
-        <p>Inventario patrocinado por proprietarios para ganhar prioridade maxima de visibilidade.</p>
-        <small class="sales-sponsorship-note">Todos os ativos desta pagina fazem parte de campanhas pagas de destaque.</small>
+        <span class="sales-kicker">Imóveis em Destaque</span>
+        <h1><?php echo $discoveryPersonalized ? 'Destaques Selecionados para Si' : 'Os Mais Procurados Agora'; ?></h1>
+        <p><?php echo $discoveryPersonalized
+            ? 'Patrocinados reordenados com base no que já explorou — a lista muda entre visitas.'
+            : 'Os imóveis mais completos da plataforma — proprietários verificados, fotos reais e resposta garantida.'; ?></p>
+        <small class="sales-sponsorship-note"><?php echo $discoveryPersonalized
+            ? 'Todos com selo Patrocinado; a ordem é personalizada pelo seu comportamento na plataforma.'
+            : 'Estes imóveis foram promovidos para que os encontre com mais facilidade.'; ?></small>
     </div>
     <div class="sales-head-summary">
         <strong><?php echo number_format($featuredCount, 0, ',', '.'); ?></strong>
-        <span>ativos premium</span>
+        <span>imóveis em destaque</span>
     </div>
+</section>
+
+<?php if (!empty($continueExploring)): ?>
+<section class="container sales-section discovery-continue-section">
+    <div class="section-header sales-section-header">
+        <div>
+            <h2>Continuar a explorar</h2>
+            <p>Imóveis que já visitou — retome de onde parou.</p>
+        </div>
+    </div>
+    <div class="discovery-continue-grid">
+        <?php foreach ($continueExploring as $property): ?>
+            <?php
+            if (is_file($partialCarouselCard)) {
+                $badgeLabel = 'Visto recentemente';
+                $showSponsoredBadge = !empty($property['featured']);
+                $position = 0;
+                include $partialCarouselCard;
+            }
+            ?>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<section class="container sales-results-toolbar">
+    <div class="sales-results-copy">
+        <strong><?php echo $totalFeatured > 0 ? ('Mostrando ' . number_format($rangeStart, 0, ',', '.') . ' a ' . number_format($rangeEnd, 0, ',', '.') . ' de ' . number_format($totalFeatured, 0, ',', '.')) : 'Sem imóveis em destaque'; ?></strong>
+        <span><?php echo $discoveryPersonalized
+            ? 'A grelha abaixo varia conforme o seu histórico — menos repetição, mais relevância.'
+            : ($totalFeatured > 0 ? 'Os mais bem apresentados neste momento — prontos para visita e negociação.' : 'Nenhum imóvel com destaque neste momento.'); ?></span>
+    </div>
+    <?php if ($totalPages > 1): ?>
+        <div class="sales-pagination-inline">
+            <span>Pagina <?php echo $page; ?> de <?php echo $totalPages; ?></span>
+            <?php if ($page > 1): ?>
+                <a href="<?php echo htmlspecialchars($buildPageUrl($page - 1)); ?>" class="btn-secondary">&larr; Anterior</a>
+            <?php endif; ?>
+            <?php if ($page < $totalPages): ?>
+                <a href="<?php echo htmlspecialchars($buildPageUrl($page + 1)); ?>" class="btn-secondary">Proxima &rarr;</a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
 </section>
 
 <section class="container featured-intro-band">
     <article>
-        <strong>Inventario premium</strong>
-        <span>Activos patrocinados para ganhar mais visibilidade e gerar procura mais qualificada.</span>
+        <strong>Mais detalhes</strong>
+        <span>Imóveis com fotos reais, preços definidos e proprietários prontos a responder.</span>
     </article>
     <article>
-        <strong>Maior urgencia</strong>
-        <span>Imoveis pensados para liderar descoberta, contacto e proposta dentro do funil.</span>
+        <strong>Sai mais rápido</strong>
+        <span>Os imóveis aqui anunciados têm maior procura e saem do mercado mais rapidamente.</span>
     </article>
     <article>
         <strong>Mais contexto</strong>
-        <span>Leitura rapida de preco, confianca do proprietario e atributos principais do activo.</span>
+        <span>Veja preço, localização, quartos e selo de confiança do proprietário — tudo de uma vez.</span>
     </article>
 </section>
 
 <section class="container sales-listing-section">
+    <?php if ($discoveryPersonalized): ?>
+        <p class="sales-grid-section-title">Patrocinados para si — ordem dinâmica com base no seu comportamento</p>
+    <?php endif; ?>
     <div class="sales-property-grid">
         <?php if (!empty($properties)): ?>
             <?php foreach ($properties as $property): ?>
                 <?php
-                $imagesList = json_decode((string) ($property['images'] ?? '[]'), true);
-                $firstImage = (is_array($imagesList) && !empty($imagesList[0])) ? (string) $imagesList[0] : '';
-                if ($firstImage !== '' && !preg_match('#^https?://#i', $firstImage)) {
-                    $firstImage = DIRPAGE . ltrim($firstImage, '/');
+                if (is_file($partialGridCard)) {
+                    include $partialGridCard;
                 }
-                $coverImage = $firstImage !== '' ? $firstImage : (DIRIMG . 'placeholder.jpg');
                 ?>
-                <article class="sales-property-card sales-card-featured">
-                    <div class="sales-property-media">
-                        <img src="<?php echo htmlspecialchars($coverImage); ?>" alt="<?php echo htmlspecialchars($property['title']); ?>">
-                        <span class="sales-card-badge"><i class="fa fa-bullhorn"></i> Patrocinado</span>
-                    </div>
-
-                    <div class="sales-property-body">
-                        <h3><?php echo htmlspecialchars($property['title']); ?></h3>
-                        <p class="sales-location"><i class="fa fa-map-marker"></i> <?php echo htmlspecialchars($property['location']); ?></p>
-                        <p class="sales-price"><?php echo number_format((float) $property['price'], 0, ',', '.'); ?> Kz</p>
-
-                        <div class="sales-meta-row">
-                            <span><i class="fa fa-bed"></i> <?php echo (int) $property['bedrooms']; ?> quartos</span>
-                            <span><i class="fa fa-bath"></i> <?php echo (int) $property['bathrooms']; ?> banhos</span>
-                        </div>
-
-                        <div class="sales-trust-row">
-                            <span><i class="fa fa-user"></i> <?php echo !empty($property['owner_name']) ? htmlspecialchars($property['owner_name']) : 'Nao informado'; ?></span>
-                            <?php if (!empty($property['owner_verified'])): ?>
-                                <span class="sales-trust-chip verified"><i class="fa fa-shield"></i> Verificado</span>
-                            <?php endif; ?>
-                            <?php if (!empty($property['owner_trusted'])): ?>
-                                <span class="sales-trust-chip trusted"><i class="fa fa-check-circle"></i> Confianca</span>
-                            <?php endif; ?>
-                        </div>
-
-                        <a href="<?php echo DIRPAGE; ?>property/<?php echo (int) $property['id']; ?>" class="btn-primary sales-card-cta">Quero esta oportunidade</a>
-                    </div>
-                </article>
             <?php endforeach; ?>
         <?php else: ?>
             <div class="sales-empty-state">
@@ -80,3 +130,19 @@
         <?php endif; ?>
     </div>
 </section>
+
+<?php if ($totalPages > 1): ?>
+<section class="container sales-pagination-section">
+    <div class="sales-pagination-inline sales-pagination-inline-bottom">
+        <?php if ($page > 1): ?>
+            <a href="<?php echo htmlspecialchars($buildPageUrl($page - 1)); ?>" class="btn-secondary">&larr; Anterior</a>
+        <?php endif; ?>
+        <span>Pagina <?php echo $page; ?> de <?php echo $totalPages; ?></span>
+        <?php if ($page < $totalPages): ?>
+            <a href="<?php echo htmlspecialchars($buildPageUrl($page + 1)); ?>" class="btn-secondary">Proxima &rarr;</a>
+        <?php endif; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+</div>

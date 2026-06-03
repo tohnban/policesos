@@ -1,0 +1,15 @@
+parameters:
+    level: 5
+    paths:
+        - src/classes
+        - app/model
+        - app/controller
+        - app/services
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+    excludePaths:
+        - src/vendor
+    reportUnmatchedIgnoredErrors: false
+
+includes:
+    - phpstan-baseline.neon

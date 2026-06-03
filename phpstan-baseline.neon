@@ -1,0 +1,301 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Call to static method check\\(\\) on an unknown class App\\\\controller\\\\Src\\\\classes\\\\ClassAuth\\.$#"
+			count: 1
+			path: app/controller/ControllerAuth.php
+
+		-
+			message: "#^Offset 'email' on array\\{name\\: string, user_type\\: string, document_number\\: string, email\\: string, password\\: mixed, password_confirm\\: mixed, phone\\: string, is_affiliate\\: 0, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: app/controller/ControllerAuth.php
+
+		-
+			message: "#^Offset 'user_type' on array\\{name\\: string, user_type\\: string, document_number\\: string, email\\: string, password\\: mixed, password_confirm\\: mixed, phone\\: string, is_affiliate\\: 0, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/controller/ControllerAuth.php
+
+		-
+			message: "#^Comparison operation \"\\<\\=\" between int\\<1, 365\\> and 0 is always false\\.$#"
+			count: 1
+			path: app/controller/ControllerDashboard.php
+
+		-
+			message: "#^Offset 'allowed' on array\\{allowed\\: bool, blockers\\: array\\<int, string\\>, badge_status\\: string, eligibility\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: app/controller/ControllerDashboard.php
+
+		-
+			message: "#^Offset 'blockers' on \\*NEVER\\* on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/controller/ControllerDashboard.php
+
+		-
+			message: "#^Offset 'blockers' on array\\{allowed\\: bool, blockers\\: array\\<int, string\\>, badge_status\\: string, eligibility\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/controller/ControllerDashboard.php
+
+		-
+			message: "#^Offset 'image/gif'\\|'image/jpeg'\\|'image/png'\\|'image/webp' on array\\{image/jpeg\\: 'jpg', image/png\\: 'png', image/gif\\: 'gif', image/webp\\: 'webp'\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 3
+			path: app/controller/ControllerDashboard.php
+
+		-
+			message: "#^Offset 'image/gif'\\|'image/jpeg'\\|'image/png'\\|'image/webp' on array\\{image/jpeg\\: 'jpg', image/png\\: 'png', image/webp\\: 'webp', image/gif\\: 'gif'\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/controller/ControllerDashboard.php
+
+		-
+			message: "#^Offset 1 on array\\{string, non\\-empty\\-string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: app/controller/ControllerDashboard.php
+
+		-
+			message: "#^Offset 1 on array\\{string, string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/controller/ControllerDashboard.php
+
+		-
+			message: "#^Offset 'boost_fee'\\|'commission_payout'\\|'manual_adjustment'\\|'subscription_fee'\\|'trust_badge_fee' on array\\{commission_payout\\: 'Comissão', boost_fee\\: 'Destaque', trust_badge_fee\\: 'Selo', manual_adjustment\\: 'Ajuste manual', subscription_fee\\: 'Subscrição'\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/controller/ControllerPayment.php
+
+		-
+			message: "#^Offset 'cancelado'\\|'confirmado'\\|'falhado'\\|'pendente'\\|'processando' on array\\{pendente\\: 'Pendente', processando\\: 'Processando', confirmado\\: 'Confirmado', cancelado\\: 'Cancelado', falhado\\: 'Falhado', rejeitado\\: 'Rejeitado'\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/controller/ControllerPayment.php
+
+		-
+			message: "#^Offset 'continueExploring' on array\\{properties\\: array\\<int, array\\<string, mixed\\>\\>, discoveryPersonalized\\: bool, continueExploring\\: array\\<int, array\\<string, mixed\\>\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 4
+			path: app/controller/ControllerProperty.php
+
+		-
+			message: "#^Offset 'discoveryPersonaliz…' on array\\{properties\\: array\\<int, array\\<string, mixed\\>\\>, discoveryPersonalized\\: bool, continueExploring\\: array\\<int, array\\<string, mixed\\>\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 4
+			path: app/controller/ControllerProperty.php
+
+		-
+			message: "#^Offset 'image/gif'\\|'image/jpeg'\\|'image/png'\\|'image/webp' on array\\{image/jpeg\\: 'jpg', image/png\\: 'png', image/gif\\: 'gif', image/webp\\: 'webp'\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/controller/ControllerProperty.php
+
+		-
+			message: "#^Offset 'error' on array on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: app/controller/ControllerRequest.php
+
+		-
+			message: "#^Offset 'id' on non\\-empty\\-array on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/controller/ControllerRequest.php
+
+		-
+			message: "#^Offset 'image/gif'\\|'image/jpeg'\\|'image/png'\\|'image/webp' on array\\{image/jpeg\\: 'jpg', image/png\\: 'png', image/webp\\: 'webp', image/gif\\: 'gif'\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/controller/ControllerRequest.php
+
+		-
+			message: "#^Offset 'message' on array\\{user_id\\: mixed, property_id\\: int, affiliate_id\\: int\\<1, max\\>\\|null, type\\: 'aluguer_curto'\\|'aluguer_longo'\\|'compra', payment_term\\: 'anual'\\|'mensal'\\|'semestral'\\|'trimestral'\\|null, months_count\\: 1\\|3\\|6\\|12, monthly_reference_amount\\: float, modality_total_amount\\: float, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/controller/ControllerRequest.php
+
+		-
+			message: "#^Right side of && is always true\\.$#"
+			count: 1
+			path: app/controller/ControllerRequest.php
+
+		-
+			message: "#^Ternary operator condition is always true\\.$#"
+			count: 1
+			path: app/controller/ControllerRequest.php
+
+		-
+			message: "#^Call to an undefined static method App\\\\model\\\\Property\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: app/controller/ControllerSitemap.php
+
+		-
+			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
+			count: 1
+			path: app/model/User.php
+
+		-
+			message: "#^Offset 'allowed' on array\\{allowed\\: bool, blockers\\: array\\<int, string\\>, badge_status\\: string, eligibility\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 3
+			path: app/model/User.php
+
+		-
+			message: "#^Offset 'blockers' on array\\{allowed\\: bool, blockers\\: array\\<int, string\\>, badge_status\\: string, eligibility\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: app/model/User.php
+
+		-
+			message: "#^Offset 'eligibility' on array\\{allowed\\: bool, blockers\\: array\\<int, string\\>, badge_status\\: string, eligibility\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/model/User.php
+
+		-
+			message: "#^Offset 'eligible' on array\\{eligible\\: int, total_fechado_ganho\\: int, excluded_contested\\: int, excluded_pending\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/model/User.php
+
+		-
+			message: "#^Access to protected property App\\\\model\\\\Commission\\:\\:\\$table\\.$#"
+			count: 1
+			path: app/services/CommissionSettlementService.php
+
+		-
+			message: "#^Offset 'preview' on array\\{unread_count\\: int, preview\\: array\\<int, array\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/services/HeaderShellService.php
+
+		-
+			message: "#^Offset 'unread_count' on array\\{unread_count\\: int, preview\\: array\\<int, array\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: app/services/HeaderShellService.php
+
+		-
+			message: "#^Static property Src\\\\classes\\\\ClassEnv\\:\\:\\$env is never read, only written\\.$#"
+			count: 1
+			path: src/classes/ClassEnv.php
+
+		-
+			message: "#^Right side of && is always true\\.$#"
+			count: 1
+			path: src/classes/ClassMailer.php
+
+		-
+			message: "#^Parameter \\#2 \\$value of function ini_set expects string, int given\\.$#"
+			count: 1
+			path: src/classes/ClassSession.php
+
+		-
+			message: "#^Offset 'allowed' on array\\{allowed\\: bool, blockers\\: array\\<int, string\\>, badge_status\\: string, eligibility\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ClassTrustBadgeEligibility.php
+
+		-
+			message: "#^Offset 'badge_status' on array\\{allowed\\: bool, blockers\\: array\\<int, string\\>, badge_status\\: string, eligibility\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ClassTrustBadgeEligibility.php
+
+		-
+			message: "#^Offset 'eligible' on array\\{eligible\\: int, total_fechado_ganho\\: int, excluded_contested\\: int, excluded_pending\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ClassTrustBadgeEligibility.php
+
+		-
+			message: "#^Offset 'excluded_contested' on array\\{eligible\\: int, total_fechado_ganho\\: int, excluded_contested\\: int, excluded_pending\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ClassTrustBadgeEligibility.php
+
+		-
+			message: "#^Offset 'excluded_pending' on array\\{eligible\\: int, total_fechado_ganho\\: int, excluded_contested\\: int, excluded_pending\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ClassTrustBadgeEligibility.php
+
+		-
+			message: "#^Offset 'met' on array\\{won_deals\\: array\\{current\\: int, required\\: int, met\\: bool, total_fechado_ganho\\: int, excluded_contested\\: int, excluded_pending\\: int\\}, account_age_days\\: array\\{current\\: int, required\\: int, met\\: bool\\}, met\\: bool\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ClassTrustBadgeEligibility.php
+
+		-
+			message: "#^Offset 'total_fechado_ganho' on array\\{eligible\\: int, total_fechado_ganho\\: int, excluded_contested\\: int, excluded_pending\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ClassTrustBadgeEligibility.php
+
+		-
+			message: "#^Offset 'allowed' on array\\{allowed\\: bool, blockers\\: array\\<int, string\\>, badge_status\\: string, eligibility\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ClassTrustBadgeGuard.php
+
+		-
+			message: "#^Offset 'blockers' on \\*NEVER\\* on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ClassTrustBadgeGuard.php
+
+		-
+			message: "#^Offset 'decay_lambda' does not exist on array\\{sql\\: string, params\\: array\\<int, mixed\\>\\}\\.$#"
+			count: 1
+			path: src/classes/DiscoveryEngine.php
+
+		-
+			message: "#^Offset 'lookback_days' does not exist on array\\{sql\\: string, params\\: array\\<int, mixed\\>\\}\\.$#"
+			count: 1
+			path: src/classes/DiscoveryEngine.php
+
+		-
+			message: "#^Offset 'max_score' does not exist on array\\{sql\\: string, params\\: array\\<int, mixed\\>\\}\\.$#"
+			count: 1
+			path: src/classes/DiscoveryEngine.php
+
+		-
+			message: "#^Offset 'view_penalty_points' does not exist on array\\{sql\\: string, params\\: array\\<int, mixed\\>\\}\\.$#"
+			count: 1
+			path: src/classes/DiscoveryEngine.php
+
+		-
+			message: "#^Offset 'view_penalty…' does not exist on array\\{sql\\: string, params\\: array\\<int, mixed\\>\\}\\.$#"
+			count: 1
+			path: src/classes/DiscoveryEngine.php
+
+		-
+			message: "#^Offset 'weight_favorite' does not exist on array\\{sql\\: string, params\\: array\\<int, mixed\\>\\}\\.$#"
+			count: 1
+			path: src/classes/DiscoveryEngine.php
+
+		-
+			message: "#^Offset 'weight_request' does not exist on array\\{sql\\: string, params\\: array\\<int, mixed\\>\\}\\.$#"
+			count: 1
+			path: src/classes/DiscoveryEngine.php
+
+		-
+			message: "#^Offset 'weight_view' does not exist on array\\{sql\\: string, params\\: array\\<int, mixed\\>\\}\\.$#"
+			count: 1
+			path: src/classes/DiscoveryEngine.php
+
+		-
+			message: "#^Variable \\$visitorVisitorKey on left side of \\?\\? is never defined\\.$#"
+			count: 1
+			path: src/classes/DiscoveryEngine.php
+
+		-
+			message: "#^Offset 'file' on array\\{type\\: int, message\\: string, file\\: string, line\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ErrorHandler.php
+
+		-
+			message: "#^Offset 'line' on array\\{type\\: int, message\\: string, file\\: string, line\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ErrorHandler.php
+
+		-
+			message: "#^Offset 'message' on array\\{type\\: int, message\\: string, file\\: string, line\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/ErrorHandler.php
+
+		-
+			message: "#^Offset 'type' on array\\{type\\: int, message\\: string, file\\: string, line\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: src/classes/ErrorHandler.php
+
+		-
+			message: "#^Right side of && is always true\\.$#"
+			count: 1
+			path: src/classes/ErrorHandler.php
+
+		-
+			message: "#^Offset 'info' on array\\{debug\\: 10, info\\: 20, notice\\: 25, warning\\: 30, error\\: 40, critical\\: 50, alert\\: 60, emergency\\: 70\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: src/classes/TechnicalLogger.php
+
+		-
+			message: "#^Result of \\|\\| is always true\\.$#"
+			count: 1
+			path: src/classes/TechnicalLogger.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between \\*NEVER\\* and '' will always evaluate to false\\.$#"
+			count: 1
+			path: src/classes/TechnicalLogger.php

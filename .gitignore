@@ -1,0 +1,19 @@
+.env
+storage/logs/*
+!storage/logs/.gitkeep
+storage/sessions/*
+storage/cache/*
+vendor/
+src/vendor/
+src/composer.phar
+.php-cs-fixer.cache
+tmp_cookie.txt
+*.log
+
+# Runtime uploads (generated locally)
+public/storage/uploads/**
+storage/uploads/**
+
+# Local migration/sync artifacts
+antigo/
+sync_report.txt
