@@ -1,0 +1,14 @@
+.env
+storage/logs/*
+storage/sessions/*
+storage/cache/*
+vendor/
+*.log
+
+# Runtime uploads (generated locally)
+public/storage/uploads/**
+storage/uploads/**
+
+# Local migration/sync artifacts
+antigo/
+sync_report.txt

@@ -1,0 +1,33 @@
+# Imobil Fácil - robots.txt
+# Last updated: 2026-05-15
+
+# Allow all bots by default
+User-agent: *
+Allow: /
+
+# Disallow private areas
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api
+Disallow: /auth
+Disallow: /private
+
+# Disallow specific bot activities
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+Disallow: /*?*page=
+Disallow: /search?
+
+# Crawl delay for aggressive crawlers
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+User-agent: DotBot
+Crawl-delay: 10
+
+# Sitemap reference
+Sitemap: http://localhost/sitemap.xml
+Sitemap: http://localhost/sitemap-properties.xml

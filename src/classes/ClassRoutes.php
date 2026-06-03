@@ -14,8 +14,41 @@ use TraitUrlParser;
 		$I=$url[0];
 
 		$this->Rotas= array(
-			""=>"ControllerApi",
-			"api"=>"ControllerApi"
+			""=>"ControllerHome",
+			"home"=>"ControllerHome",
+			"login"=>"ControllerAuth",
+			"register"=>"ControllerAuth",
+			"authenticate"=>"ControllerAuth",
+			"store"=>"ControllerAuth",
+			"logout"=>"ControllerAuth",
+			"recover"=>"ControllerAuth",
+			"reset"=>"ControllerAuth",
+			"verify"=>"ControllerAuth",
+			"properties"=>"ControllerProperty",
+			"property"=>"ControllerProperty",
+			"featured"=>"ControllerProperty",
+			"agency"=>"ControllerProperty",
+			"dashboard"=>"ControllerDashboard",
+			"requests"=>"ControllerDashboard",
+			"commissions"=>"ControllerDashboard",
+			"referrals"=>"ControllerDashboard",
+			"profile"=>"ControllerDashboard",
+			"moderate"=>"ControllerProperty",
+			"moderate_users"=>"ControllerDashboard",
+			"request"=>"ControllerRequest",
+			"payment_methods"=>"ControllerPayment",
+			"payment_channels"=>"ControllerPayment",
+			"payment_accounts"=>"ControllerDashboard",
+			"payment_transactions"=>"ControllerPayment",
+			"settings"=>"ControllerDashboard",
+			"admin_subscriptions"=>"ControllerDashboard",
+			"favorites"=>"ControllerDashboard",
+			"cookies"=>"ControllerLegal",
+			"sitemap"=>"ControllerSitemap",
+			"notification"=>"ControllerNotification",
+			"api"=>"ControllerApi",
+			"file"=>"ControllerFile",
+			// ADD YOUR ROUTES HERE
 		);
 
 		if (array_key_exists($I, $this->Rotas)) {
@@ -23,7 +56,7 @@ use TraitUrlParser;
 			{
 				return $this->Rotas[$I];
 			}
-			else{return "ControllerApi";}
+			else{return "ControllerHome";}
 		}
 		else
 		{

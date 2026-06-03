@@ -7,45 +7,14 @@
         </div>
     </section>
 
-    <div class="dashboard-module-card" style="margin-bottom:24px;">
+    <div class="dashboard-module-card dashboard-kpi-section">
         <div class="dashboard-module-head compact">
             <div>
-                <span class="dashboard-module-kicker">Propriedade própria</span>
-                <h3>Imóveis que você cadastrou</h3>
+                <span class="dashboard-module-kicker">Regra do programa</span>
+                <h3>Como a indicação funciona</h3>
             </div>
         </div>
-
-        <table class="commissions-table">
-            <thead>
-                <tr>
-                    <th>Imóvel</th>
-                    <th>Preço</th>
-                    <th>Link de Indicação</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($owned_properties)): ?>
-                    <?php foreach ($owned_properties as $property): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($property['title']); ?></td>
-                            <td><?php echo number_format((float) $property['price'], 0, ',', '.'); ?> Kz</td>
-                            <td>
-                                <div class="referral-link-wrap">
-                                    <input type="text" id="ref-owned-<?php echo (int) $property['id']; ?>" readonly value="<?php echo DIRPAGE; ?>property/<?php echo (int) $property['id']; ?>?ref=<?php echo htmlspecialchars($affiliate_code ?? ($user['affiliate_code'] ?? '')); ?>" class="referral-link-input">
-                                    <button type="button" class="btn-secondary referral-copy-btn" data-copy-target="ref-owned-<?php echo (int) $property['id']; ?>" title="Copiar link">
-                                        <i class="fa fa-copy"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="3">Nenhum imóvel próprio encontrado.</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+        <p class="dashboard-inline-note">Partilhe os seus links e ganhe <strong>3% de comissão</strong> em cada negócio fechado através das suas indicações — para imóveis onde a sua afiliação está aprovada.</p>
     </div>
 
     <div class="dashboard-module-card">
