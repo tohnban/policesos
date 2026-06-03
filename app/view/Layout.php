@@ -15,7 +15,6 @@ if ($isDashboardLayout) {
     if ($dashboardSection === 'dispute_detail') {
         $dashboardSection = 'disputes';
     }
-    }
 }
 $dashboardView = isset($_GET['view']) ? trim((string) $_GET['view']) : '';
 $dashboardMobileMenuHub = $isDashboardLayout && $dashboardSection === 'index' && $dashboardView !== 'overview';
