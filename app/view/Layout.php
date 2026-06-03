@@ -49,7 +49,7 @@ $overdueCommissionBannerMessage = (string) ($overdueCommission['message'] ?? '')
 $overdueCommissionBannerAction = (string) ($overdueCommission['action_label'] ?? 'Pagar comissões');
 $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DIRPAGE . 'dashboard/commissionPayments');
 ?>
-<html lang="pt-br">
+<html lang="<?php echo Src\classes\ClassSEO::SITE_LANGUAGE; ?>">
 <head>
     <meta charset="utf-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,7 +60,15 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
     <meta name="description" content="<?php echo Src\classes\ClassSEO::sanitizeDescription($this->getDescription());?>">
     <meta name="keywords" content="<?php echo htmlspecialchars($this->getKeywords(), ENT_QUOTES, 'UTF-8');?>">
     <meta name="language" content="<?php echo Src\classes\ClassSEO::SITE_LANGUAGE; ?>">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <?php
+    $robotsMeta = $this->getRobotsMeta() !== ''
+        ? $this->getRobotsMeta()
+        : Src\classes\ClassSEO::robotsForViewDir($currentViewDir);
+    $ogPageUrl = $this->getCanonical() !== ''
+        ? $this->getCanonical()
+        : Src\classes\ClassSEO::getCanonicalUrl();
+    ?>
+    <meta name="robots" content="<?php echo htmlspecialchars($robotsMeta, ENT_QUOTES, 'UTF-8'); ?>">
     <?php if (Src\classes\ClassAuth::check()): ?>
     <meta name="csrf-token" content="<?php echo htmlspecialchars(Src\classes\ClassCsrf::get(), ENT_QUOTES, 'UTF-8'); ?>">
     <?php endif; ?>
@@ -76,8 +84,9 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
     <meta property="og:type" content="<?php echo htmlspecialchars($this->getOgType(), ENT_QUOTES, 'UTF-8'); ?>">
     <meta property="og:title" content="<?php echo Src\classes\ClassSEO::sanitizeTitle($this->getOgTitle()); ?>">
     <meta property="og:description" content="<?php echo Src\classes\ClassSEO::sanitizeDescription($this->getOgDescription()); ?>">
-    <meta property="og:url" content="<?php echo htmlspecialchars(Src\classes\ClassSEO::getCanonicalUrl(), ENT_QUOTES, 'UTF-8'); ?>">
+    <meta property="og:url" content="<?php echo htmlspecialchars($ogPageUrl, ENT_QUOTES, 'UTF-8'); ?>">
     <meta property="og:site_name" content="<?php echo Src\classes\ClassSEO::SITE_NAME; ?>">
+    <meta property="og:locale" content="<?php echo Src\classes\ClassSEO::SITE_LOCALE; ?>">
     <?php if ($this->getOgImage()): ?>
     <meta property="og:image" content="<?php echo htmlspecialchars($this->getOgImage(), ENT_QUOTES, 'UTF-8'); ?>">
     <meta property="og:image:width" content="1200">

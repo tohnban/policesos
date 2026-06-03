@@ -47,6 +47,7 @@ class ClassRoutes
             'favorites' => 'ControllerDashboard',
             'cookies' => 'ControllerLegal',
             'sitemap' => 'ControllerSitemap',
+            'robots.txt' => 'ControllerSitemap',
             'notification' => 'ControllerNotification',
             'api' => 'ControllerApi',
             'file' => 'ControllerFile',

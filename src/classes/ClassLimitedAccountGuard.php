@@ -15,6 +15,7 @@ class ClassLimitedAccountGuard
         'verify',
         'cookies',
         'sitemap',
+        'robots.txt',
         '404',
     ];
 

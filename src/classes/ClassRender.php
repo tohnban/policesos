@@ -14,6 +14,7 @@ class ClassRender
     private $OgDescription = '';
     private $OgImage = '';
     private $OgType = 'website';
+    private $RobotsMeta = '';
     private $StructuredData = [];
 
     public function getDir()
@@ -102,6 +103,17 @@ class ClassRender
     public function setOgType($OgType)
     {
         $this->OgType = $OgType;
+        return $this;
+    }
+
+    public function getRobotsMeta()
+    {
+        return $this->RobotsMeta;
+    }
+
+    public function setRobotsMeta($RobotsMeta)
+    {
+        $this->RobotsMeta = (string) $RobotsMeta;
         return $this;
     }
 

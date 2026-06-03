@@ -3,24 +3,33 @@
 namespace App\controller;
 
 use App\model\Property;
+use Src\classes\ClassSEO;
 
 class ControllerSitemap
 {
+    public function robots()
+    {
+        header('Content-Type: text/plain; charset=utf-8');
+        echo ClassSEO::renderRobotsTxt();
+        exit;
+    }
+
     /**
-     * Generate main sitemap index
+     * Sitemap index (sub-sitemaps: páginas estáticas + imóveis).
      */
     public function index()
     {
         header('Content-Type: application/xml; charset=utf-8');
-        echo '<?xml version="1.0" encoding="UTF-8"?>';
-        echo "\n";
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         ?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <sitemap>
-        <loc><?php echo htmlspecialchars(DIRPAGE . 'sitemap/pages'); ?></loc>
+        <loc><?php echo htmlspecialchars(rtrim(DIRPAGE, '/') . '/sitemap/pages'); ?></loc>
+        <lastmod><?php echo date('c'); ?></lastmod>
     </sitemap>
     <sitemap>
-        <loc><?php echo htmlspecialchars(DIRPAGE . 'sitemap/properties'); ?></loc>
+        <loc><?php echo htmlspecialchars(rtrim(DIRPAGE, '/') . '/sitemap/properties'); ?></loc>
+        <lastmod><?php echo date('c'); ?></lastmod>
     </sitemap>
 </sitemapindex>
         <?php
@@ -28,97 +37,83 @@ class ControllerSitemap
     }
 
     /**
-     * Generate pages sitemap (static pages)
+     * Static and listing URLs worth indexing.
      */
     public function pages()
     {
+        $base = rtrim(DIRPAGE, '/');
+        $urls = [
+            ['loc' => $base . '/', 'priority' => '1.0', 'changefreq' => 'daily'],
+            ['loc' => $base . '/properties', 'priority' => '0.9', 'changefreq' => 'daily'],
+            ['loc' => $base . '/featured', 'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['loc' => $base . '/cookies', 'priority' => '0.3', 'changefreq' => 'yearly'],
+        ];
+
         header('Content-Type: application/xml; charset=utf-8');
-        echo '<?xml version="1.0" encoding="UTF-8"?>';
-        echo "\n";
-        ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <!-- Homepage -->
-    <url>
-        <loc><?php echo htmlspecialchars(DIRPAGE); ?></loc>
-        <lastmod><?php echo date('c'); ?></lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>1.0</priority>
-    </url>
-    
-    <!-- Properties listing -->
-    <url>
-        <loc><?php echo htmlspecialchars(DIRPAGE . 'properties'); ?></loc>
-        <lastmod><?php echo date('c'); ?></lastmod>
-        <changefreq>daily</changefreq>
-        <priority>0.9</priority>
-    </url>
-    
-    <!-- Featured properties -->
-    <url>
-        <loc><?php echo htmlspecialchars(DIRPAGE . 'featured'); ?></loc>
-        <lastmod><?php echo date('c'); ?></lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-</urlset>
-        <?php
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        foreach ($urls as $entry) {
+            echo "  <url>\n";
+            echo '    <loc>' . htmlspecialchars($entry['loc']) . "</loc>\n";
+            echo '    <lastmod>' . date('c') . "</lastmod>\n";
+            echo '    <changefreq>' . $entry['changefreq'] . "</changefreq>\n";
+            echo '    <priority>' . $entry['priority'] . "</priority>\n";
+            echo "  </url>\n";
+        }
+        echo "</urlset>\n";
         exit;
     }
 
     /**
-     * Generate properties sitemap (dynamic content)
+     * Individual property detail pages.
      */
     public function properties()
     {
-        try {
-            // Get available properties with public status
-            $properties = Property::where('status', 'IN', ['disponivel', 'vendido', 'alugado'])
-                ->orderBy('updated_at', 'DESC')
-                ->limit(50000)  // Sitemap max 50k URLs
-                ->get();
+        header('Content-Type: application/xml; charset=utf-8');
 
-            header('Content-Type: application/xml; charset=utf-8');
-            echo '<?xml version="1.0" encoding="UTF-8"?>';
-            echo "\n";
-            ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-            <?php
-            if (!empty($properties)) {
-                foreach ($properties as $property) {
-                    $url = DIRPAGE . 'property/' . $property['id'];
-                    $lastmod = !empty($property['updated_at']) ? date('c', strtotime($property['updated_at'])) : date('c');
-                    $priority = ($property['status'] === 'disponivel') ? 0.8 : 0.6;
-                    $changefreq = ($property['status'] === 'disponivel') ? 'weekly' : 'monthly';
-                    ?>
-    <url>
-        <loc><?php echo htmlspecialchars($url); ?></loc>
-        <lastmod><?php echo $lastmod; ?></lastmod>
-        <changefreq><?php echo $changefreq; ?></changefreq>
-        <priority><?php echo $priority; ?></priority>
-        <?php if (!empty($property['primary_image_url'])): ?>
-        <image:image>
-            <image:loc><?php echo htmlspecialchars($property['primary_image_url']); ?></image:loc>
-            <image:title><?php echo htmlspecialchars($property['title'] ?? 'Propriedade'); ?></image:title>
-        </image:image>
-        <?php endif; ?>
-    </url>
-            <?php
+        try {
+            $properties = Property::getPublicSitemapEntries();
+            $base = rtrim(DIRPAGE, '/');
+
+            echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+            echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' . "\n";
+            echo '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
+
+            foreach ($properties as $property) {
+                $id = (int) ($property['id'] ?? 0);
+                if ($id <= 0) {
+                    continue;
                 }
+
+                $url = $base . '/property/' . $id;
+                $lastmod = !empty($property['created_at'])
+                    ? date('c', strtotime((string) $property['created_at']))
+                    : date('c');
+                $status = (string) ($property['status'] ?? 'disponivel');
+                $priority = $status === 'disponivel' ? '0.8' : '0.6';
+                $changefreq = $status === 'disponivel' ? 'weekly' : 'monthly';
+                $imageUrl = ClassSEO::propertyImageUrl($property);
+
+                echo "  <url>\n";
+                echo '    <loc>' . htmlspecialchars($url) . "</loc>\n";
+                echo '    <lastmod>' . $lastmod . "</lastmod>\n";
+                echo '    <changefreq>' . $changefreq . "</changefreq>\n";
+                echo '    <priority>' . $priority . "</priority>\n";
+                if ($imageUrl !== '') {
+                    echo "    <image:image>\n";
+                    echo '      <image:loc>' . htmlspecialchars($imageUrl) . "</image:loc>\n";
+                    echo '      <image:title>' . htmlspecialchars((string) ($property['title'] ?? 'Imóvel')) . "</image:title>\n";
+                    echo "    </image:image>\n";
+                }
+                echo "  </url>\n";
             }
-            ?>
-</urlset>
-            <?php
+
+            echo "</urlset>\n";
         } catch (\Throwable $e) {
-            header('Content-Type: application/xml; charset=utf-8');
-            echo '<?xml version="1.0" encoding="UTF-8"?>';
-            echo "\n";
-            ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <!-- Fallback: No properties available -->
-</urlset>
-            <?php
+            echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+            echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>' . "\n";
         }
+
         exit;
     }
 }

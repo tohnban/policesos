@@ -433,7 +433,7 @@ class ControllerProperty
         $pageNum = $page > 1 ? ' - Página ' . $page : '';
         $render->setTitle('Imóveis Disponíveis' . $pageNum);
         $render->setDescription('Encontre e compare imóveis disponíveis. Anuncie a sua propriedade com segurança e facilidade na Imobil Fácil.');
-        $render->setKeywords('imóveis, casas, apartamentos, aluguel, venda, propriedades portugal');
+        $render->setKeywords(ClassSEO::DEFAULT_KEYWORDS);
         $render->setOgTitle('Imóveis Disponíveis' . $pageNum);
         $render->setOgDescription('Procure imóveis por localização, preço e características. Negocie com segurança na nossa plataforma.');
         $render->setCanonical(DIRPAGE . 'properties' . ($page > 1 ? '?page=' . $page : ''));
@@ -448,7 +448,8 @@ class ControllerProperty
             'Encontre imóveis verificados na plataforma Imobil Fácil',
             $itemsForSchema,
             $page,
-            $totalPages
+            $totalPages,
+            'properties' . ($page > 1 ? '?page=' . $page : '')
         );
         $render->addStructuredData($collectionSchema);
 
@@ -561,18 +562,18 @@ class ControllerProperty
         $render = new ClassRender();
 
         // SEO Configuration
-        $title = $property['title'] ?? 'Propriedade';
-        $description = substr($property['description'] ?? '', 0, 150);
-        $propertyType = $property['type'] ?? 'imóvel';
-        $price = $property['price'] ?? 0;
-        $location = ($property['city'] ?? '') . ', ' . ($property['state'] ?? '');
+        $title = (string) ($property['title'] ?? 'Imóvel');
+        $description = ClassSEO::excerptFromText($property['description'] ?? '');
+        $propertyType = (string) ($property['type'] ?? 'imóvel');
+        $location = trim((string) ($property['location'] ?? ''));
+        $titleSuffix = $location !== '' ? ' — ' . $location : '';
 
-        $render->setTitle($title . ' - ' . $location);
+        $render->setTitle($title . $titleSuffix);
         $render->setDescription($description);
-        $render->setKeywords('imóvel, ' . $propertyType . ', ' . ($property['city'] ?? '') . ', aluguel, venda');
+        $render->setKeywords('imóvel angola, ' . $propertyType . ', ' . $location . ', venda, aluguer');
         $render->setOgTitle($title);
         $render->setOgDescription($description);
-        $render->setOgImage($property['primary_image_url'] ?? DIRIMG . 'placeholder.jpg');
+        $render->setOgImage(ClassSEO::propertyImageUrl($property));
         $render->setOgType('product');
         $render->setCanonical(DIRPAGE . 'property/' . $property['id']);
 
@@ -961,15 +962,18 @@ class ControllerProperty
         }
 
         $agencyName = (string) ($agencyUser['name'] ?? 'Agência');
-        $render = new ClassRender();
-        $render->setTitle($agencyName . ($isJuridica ? ' — Empresa' : ' — Profissional'));
-        $render->setDescription(
-            ($isJuridica ? 'Empresa imobiliária' : 'Profissional imobiliário')
+        $agencyDescription = ($isJuridica ? 'Empresa imobiliária' : 'Profissional imobiliário')
             . ' com catálogo de imóveis disponíveis: '
             . $agencyName
-            . '.'
-        );
-        $render->setKeywords('agência imobiliária, promotor, imóveis, ' . $agencyName);
+            . '.';
+        $render = new ClassRender();
+        $render->setTitle($agencyName . ($isJuridica ? ' — Empresa' : ' — Profissional'));
+        $render->setDescription($agencyDescription);
+        $render->setKeywords('agência imobiliária angola, promotor, imóveis, ' . $agencyName);
+        $render->setCanonical(ClassPlan::getPublicProfileUrl($agencyUserId));
+        $render->setOgTitle($agencyName . ' — Imobil Fácil');
+        $render->setOgDescription($agencyDescription);
+        $render->setOgImage(ClassSEO::defaultOgImage());
         $render->addStructuredData(ClassSEO::getBreadcrumbSchema([
             ['name' => 'Início', 'url' => DIRPAGE],
             ['name' => 'Imóveis', 'url' => DIRPAGE . 'properties'],
@@ -1023,10 +1027,19 @@ class ControllerProperty
             $favoriteIds = Favorite::getPropertyIdsByUser(ClassAuth::user()['id']);
         }
 
+        $pageLabel = $page > 1 ? ' — Página ' . $page : '';
         $render = new ClassRender();
-        $render->setTitle('Imóveis em Destaque');
-        $render->setDescription('Imóveis em destaque');
-        $render->setKeywords('destaque, imóveis');
+        $render->setTitle('Imóveis em Destaque' . $pageLabel);
+        $render->setDescription('Imóveis patrocinados e em destaque na Imobil Fácil. Descubra as melhores oportunidades em Angola.');
+        $render->setKeywords('imóveis destaque, patrocinados, angola, ' . ClassSEO::DEFAULT_KEYWORDS);
+        $render->setOgTitle('Imóveis em Destaque — Imobil Fácil');
+        $render->setOgDescription('Seleção de imóveis em destaque com maior visibilidade na plataforma.');
+        $render->setOgImage(ClassSEO::defaultOgImage());
+        $render->setCanonical(DIRPAGE . 'featured' . ($page > 1 ? '?page=' . $page : ''));
+        $render->addStructuredData(ClassSEO::getBreadcrumbSchema([
+            ['name' => 'Início', 'url' => rtrim(DIRPAGE, '/')],
+            ['name' => 'Destaques', 'url' => rtrim(DIRPAGE, '/') . '/featured'],
+        ]));
         $render->setData([
             'properties' => $properties,
             'favoriteIds' => $favoriteIds,

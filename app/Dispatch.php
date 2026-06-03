@@ -91,6 +91,10 @@ class Dispatch extends ClassRoutes {
 
 		ClassRateLimiter::enforceGlobalPost();
 		$defaultMethod = (string) ($url[0] ?? '');
+		if ($defaultMethod === 'robots.txt' && method_exists($this->Obj, 'robots')) {
+			$this->Obj->robots();
+			return;
+		}
 		if ($defaultMethod !== '' && method_exists($this->Obj, $defaultMethod)) {
 			$this->Obj->{$defaultMethod}();
 			return;

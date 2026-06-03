@@ -27,6 +27,7 @@ class ClassCommissionGuard
         'verify',
         'cookies',
         'sitemap',
+        'robots.txt',
     ];
 
     private const BLOCKED_ROUTE_KEYS = [

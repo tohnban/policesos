@@ -382,6 +382,26 @@ class Property extends ManipularBanco
         });
     }
 
+    /**
+     * Public property URLs for XML sitemap (disponivel, vendido, alugado).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function getPublicSitemapEntries(int $limit = 50000): array
+    {
+        $limit = max(1, min(50000, $limit));
+        $db = new self();
+        $sql = "SELECT id, title, images, status, created_at
+                FROM {$db->table}
+                WHERE status IN ('disponivel', 'vendido', 'alugado')
+                ORDER BY created_at DESC
+                LIMIT {$limit}";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+    }
+
     public static function find($id)
     {
         $db = new self();

@@ -9,6 +9,8 @@ final class LayoutPresenter
 {
     public static function prime(ClassRender $render): void
     {
+        ClassSEO::primeLayoutSeo($render);
+
         if (!ClassAuth::check()) {
             $render->setData([
                 'headerShell' => HeaderShellService::forGuest(),

@@ -58,16 +58,16 @@ class ControllerHome
             }
 
             // SEO Configuration
-            $Render->setTitle('Imobil Fácil - Encontre e Negocie Imóveis com Segurança');
-            $Render->setDescription('Plataforma de negociação de imóveis verificados. Encontre casas, apartamentos e propriedades comerciais com garantia de segurança e negociação fácil.');
-            $Render->setKeywords('imóveis, casas, apartamentos, aluguel, venda, propriedades, portugal');
-            $Render->setOgTitle('Imobil Fácil - Plataforma de Negociação de Imóveis');
-            $Render->setOgDescription('Encontre, anuncie e negocie imóveis de forma simples e segura. Pague com segurança através da nossa plataforma.');
-            $Render->setOgImage(DIRIMG . 'og-home.jpg');
+            $Render->setTitle('Imobil Fácil — Imóveis em Angola com Negociação Segura');
+            $Render->setDescription('Encontre casas, apartamentos e imóveis comerciais em Angola. Anuncie, compare e negocie com transparência na Imobil Fácil.');
+            $Render->setKeywords(ClassSEO::DEFAULT_KEYWORDS);
+            $Render->setOgTitle('Imobil Fácil — Plataforma de Imóveis em Angola');
+            $Render->setOgDescription('Imóveis verificados para venda e aluguer. Negocie com segurança na maior plataforma imobiliária angolana.');
+            $Render->setOgImage(ClassSEO::defaultOgImage());
             $Render->setOgType('website');
             $Render->setCanonical(rtrim(DIRPAGE, '/'));
 
-            // Add organization structured data
+            $Render->addStructuredData(ClassSEO::getWebSiteSchema());
             $Render->addStructuredData(ClassSEO::getOrganizationSchema());
 
             // Add breadcrumb structured data
