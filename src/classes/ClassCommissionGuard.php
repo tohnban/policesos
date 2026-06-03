@@ -26,6 +26,8 @@ class ClassCommissionGuard
         'reset',
         'verify',
         'cookies',
+        'privacidade',
+        'termos',
         'sitemap',
         'robots.txt',
     ];

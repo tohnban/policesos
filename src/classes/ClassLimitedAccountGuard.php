@@ -14,6 +14,8 @@ class ClassLimitedAccountGuard
         'reset',
         'verify',
         'cookies',
+        'privacidade',
+        'termos',
         'sitemap',
         'robots.txt',
         '404',

@@ -430,15 +430,15 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
                         <i class="fa fa-chevron-down" aria-hidden="true"></i>
                     </button>
                     <div class="footer-links footer-column-panel is-collapsed" id="footer-panel-legal">
-                        <a href="<?php echo DIRPAGE; ?>cookies">Politica de Cookies</a>
+                        <a href="<?php echo DIRPAGE; ?>cookies">Política de Cookies</a>
+                        <a href="<?php echo DIRPAGE; ?>privacidade">Política de Privacidade</a>
+                        <a href="<?php echo DIRPAGE; ?>termos">Termos e Condições</a>
                         <a href="#" data-open-cookie-consent="1">Gerir Cookies</a>
                         <?php if (Src\classes\ClassAuth::check()): ?>
                             <a href="<?php echo DIRPAGE; ?>profile">Configurações</a>
                         <?php else: ?>
                             <a href="<?php echo DIRPAGE; ?>login">Configurações</a>
                         <?php endif; ?>
-                        <span>Politica de Privacidade em breve</span>
-                        <span>Termos e Condições em breve</span>
                     </div>
                 </div>
             </div>

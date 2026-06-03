@@ -46,6 +46,8 @@ class ClassRoutes
             'admin_subscriptions' => 'ControllerDashboard',
             'favorites' => 'ControllerDashboard',
             'cookies' => 'ControllerLegal',
+            'privacidade' => 'ControllerLegal',
+            'termos' => 'ControllerLegal',
             'sitemap' => 'ControllerSitemap',
             'robots.txt' => 'ControllerSitemap',
             'notification' => 'ControllerNotification',

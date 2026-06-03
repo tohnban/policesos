@@ -47,6 +47,8 @@ class ControllerSitemap
             ['loc' => $base . '/properties', 'priority' => '0.9', 'changefreq' => 'daily'],
             ['loc' => $base . '/featured', 'priority' => '0.8', 'changefreq' => 'weekly'],
             ['loc' => $base . '/cookies', 'priority' => '0.3', 'changefreq' => 'yearly'],
+            ['loc' => $base . '/privacidade', 'priority' => '0.3', 'changefreq' => 'yearly'],
+            ['loc' => $base . '/termos', 'priority' => '0.3', 'changefreq' => 'yearly'],
         ];
 
         header('Content-Type: application/xml; charset=utf-8');
