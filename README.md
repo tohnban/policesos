@@ -30,7 +30,12 @@ Uma aplicação web moderna e responsiva para o setor imobiliário, desenvolvida
 
 ## Instalação
 
-1. Clone o repositório
+1. Clone o repositório:
+
+```bash
+git clone https://github.com/tohnban/imobil.git
+cd imobil
+```
 2. Configure o ambiente: copie `.env.example` para `.env` e ajuste as configurações
 3. Execute o schema SQL em `database_schema.sql` para criar as tabelas
 4. Instale dependências PHP (a partir de `src/`):
