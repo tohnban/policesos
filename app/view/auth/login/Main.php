@@ -53,7 +53,6 @@ $loginErrorMessage = $loginErrors[$loginErrorCode] ?? ($loginErrorCode !== '' ? 
             <div class="form-group">
                 <label for="login">Email ou Telefone</label>
                 <input type="text" id="login" name="login" required autocomplete="username" placeholder="email@exemplo.com ou +244 912 345 678" minlength="3">
-                <small class="auth-helper-text">Telefone: pode usar +244, espaços ou só os 9 dígitos (ex.: 912345678).</small>
             </div>
 
             <div class="form-group">

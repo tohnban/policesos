@@ -143,7 +143,7 @@ if ($discoveryPersonalized) {
                     <input type="search"
                            name="keyword"
                            class="filter-toolbar-input"
-                           placeholder="Título, zona, @proprietário..."
+                           placeholder="Título, bairro, zona ou @proprietário..."
                            value="<?php echo htmlspecialchars((string) $keyword); ?>"
                            autocomplete="off">
                 </span>
@@ -174,11 +174,13 @@ if ($discoveryPersonalized) {
             </div>
         <?php endif; ?>
 
+        <?php require DIRREQ . 'app/view/partials/property_list_quick_filters.php'; ?>
+
         <details class="sales-filter-disclosure filter-advanced-panel" id="properties-filter-advanced">
             <summary class="filter-advanced-summary-hidden">Filtros avançados</summary>
             <div class="sales-filter-fields">
         <div class="sales-filter-grid">
-            <label>
+            <label class="properties-filter-field properties-filter-field--quick-type">
                 <span>Tipo</span>
                 <select name="type">
                     <option value="">Todos</option>
@@ -191,7 +193,7 @@ if ($discoveryPersonalized) {
                     <?php endforeach; ?>
                 </select>
             </label>
-            <label>
+            <label class="properties-filter-field properties-filter-field--quick-purpose">
                 <span>Finalidade</span>
                 <select name="purpose">
                     <option value="">Qualquer</option>
@@ -200,31 +202,31 @@ if ($discoveryPersonalized) {
                     <option value="aluguer_longo"<?php echo $purpose === 'aluguer_longo' ? ' selected' : ''; ?>>Aluguer longo</option>
                 </select>
             </label>
-            <label>
+            <label class="properties-filter-field">
                 <span>Preco minimo</span>
                 <input type="number" name="min_price" placeholder="Ex: 50000" value="<?php echo htmlspecialchars((string) $minPrice); ?>">
             </label>
-            <label>
+            <label class="properties-filter-field">
                 <span>Preco maximo</span>
                 <input type="number" name="max_price" placeholder="Ex: 300000" value="<?php echo htmlspecialchars((string) $maxPrice); ?>">
             </label>
-            <label>
+            <label class="properties-filter-field">
                 <span>Quartos minimos</span>
                 <input type="number" name="bedrooms" min="0" step="1" placeholder="Ex: 2" value="<?php echo htmlspecialchars((string) $bedrooms); ?>">
             </label>
-            <label>
+            <label class="properties-filter-field">
                 <span>Banhos minimos</span>
                 <input type="number" name="bathrooms" min="0" step="1" placeholder="Ex: 1" value="<?php echo htmlspecialchars((string) $bathrooms); ?>">
             </label>
-            <label>
+            <label class="properties-filter-field">
                 <span>Area minima</span>
                 <input type="number" name="min_area" min="0" step="0.01" placeholder="Ex: 80" value="<?php echo htmlspecialchars((string) $minArea); ?>">
             </label>
-            <label>
+            <label class="properties-filter-field">
                 <span>Area maxima</span>
                 <input type="number" name="max_area" min="0" step="0.01" placeholder="Ex: 250" value="<?php echo htmlspecialchars((string) $maxArea); ?>">
             </label>
-            <label>
+            <label class="properties-filter-field">
                 <span>Ordenacao</span>
                 <select name="sort">
                     <option value="newest"<?php echo $sort === 'newest' ? ' selected' : ''; ?>>Mais recentes</option>
@@ -233,11 +235,7 @@ if ($discoveryPersonalized) {
                     <option value="oldest"<?php echo $sort === 'oldest' ? ' selected' : ''; ?>>Mais antigos</option>
                 </select>
             </label>
-            <label class="sales-filter-wide">
-                <span>Proprietário</span>
-                <input type="text" name="owner_username" placeholder="Ex.: @maria.silva" value="<?php echo htmlspecialchars($ownerUsername); ?>" autocomplete="off" autocapitalize="off" spellcheck="false">
-            </label>
-            <label class="sales-filter-location">
+            <label class="sales-filter-location properties-filter-field">
                 <span>País</span>
                 <select name="country_id">
                     <option value="">Todos</option>
@@ -246,7 +244,7 @@ if ($discoveryPersonalized) {
                     <?php endforeach; ?>
                 </select>
             </label>
-            <label class="sales-filter-location">
+            <label class="sales-filter-location properties-filter-field">
                 <span>Região</span>
                 <select name="region_id"<?php echo $countryId > 0 ? '' : ' disabled'; ?>>
                     <option value=""><?php echo $countryId > 0 ? 'Todas' : 'Selecione um país primeiro'; ?></option>
@@ -255,11 +253,7 @@ if ($discoveryPersonalized) {
                     <?php endforeach; ?>
                 </select>
             </label>
-            <label class="sales-filter-location">
-                <span>Localizacao</span>
-                <input type="text" name="location" placeholder="Bairro, cidade, zona" value="<?php echo htmlspecialchars((string) $location); ?>">
-            </label>
-            <label class="sales-filter-check">
+            <label class="sales-filter-check properties-filter-field">
                 <span>Confianca</span>
                 <span class="sales-filter-checkbox">
                     <input type="checkbox" name="trusted_only" value="1"<?php echo $trustedOnly ? ' checked' : ''; ?>>
@@ -317,40 +311,7 @@ if ($discoveryPersonalized) {
         <strong><?php echo $resultCount > 0 ? ('Mostrando ' . number_format($rangeStart, 0, ',', '.') . ' a ' . number_format($rangeEnd, 0, ',', '.') . ' de ' . number_format($resultCount, 0, ',', '.')) : 'Sem resultados'; ?></strong>
         <span><?php echo $resultCount > 0 ? 'Refine a busca ou abra os filtros avançados para ajustar tipo, preço e localização.' : 'Altere a busca ou os filtros para ver mais imóveis disponíveis.'; ?></span>
     </div>
-    <?php if ($totalPages > 1): ?>
-        <div class="sales-pagination-inline">
-            <span>Pagina <?php echo $page; ?> de <?php echo $totalPages; ?></span>
-            <?php if ($page > 1): ?>
-                <a href="<?php echo htmlspecialchars($buildPageUrl($page - 1)); ?>" class="btn-secondary">&larr; Anterior</a>
-            <?php endif; ?>
-            <?php if ($page < $totalPages): ?>
-                <a href="<?php echo htmlspecialchars($buildPageUrl($page + 1)); ?>" class="btn-secondary">Proxima &rarr;</a>
-            <?php endif; ?>
-        </div>
-    <?php endif; ?>
 </section>
-
-<?php if (!$cursorMode && $totalPages > 1): ?>
-<section class="container sales-pagination-section">
-    <div class="sales-pagination-inline sales-pagination-inline-bottom">
-        <?php if ($page > 1): ?>
-            <a href="<?php echo htmlspecialchars($buildPageUrl($page - 1)); ?>" class="btn-secondary">&larr; Anterior</a>
-        <?php endif; ?>
-        <span>Pagina <?php echo $page; ?> de <?php echo $totalPages; ?></span>
-        <?php if ($page < $totalPages): ?>
-            <a href="<?php echo htmlspecialchars($buildPageUrl($page + 1)); ?>" class="btn-secondary">Proxima &rarr;</a>
-        <?php endif; ?>
-    </div>
-</section>
-<?php endif; ?>
-
-<?php if ($cursorMode && $nextCursor !== ''): ?>
-<section class="container sales-pagination-section">
-    <div class="sales-pagination-inline sales-pagination-inline-bottom">
-        <a href="<?php echo htmlspecialchars($buildCursorUrl($nextCursor)); ?>" class="btn-secondary">Próxima &rarr;</a>
-    </div>
-</section>
-<?php endif; ?>
 
 <?php if (!$discoveryPersonalized && !empty($sponsored)): ?>
 <section class="sales-premium-strip-wrap">
@@ -460,5 +421,27 @@ if ($discoveryPersonalized) {
         <?php endif; ?>
     </div>
 </section>
+
+<?php if (!$cursorMode && $totalPages > 1): ?>
+<section class="container sales-pagination-section">
+    <div class="sales-pagination-inline sales-pagination-inline-bottom">
+        <?php if ($page > 1): ?>
+            <a href="<?php echo htmlspecialchars($buildPageUrl($page - 1)); ?>" class="btn-secondary">&larr; Anterior</a>
+        <?php endif; ?>
+        <span>Página <?php echo $page; ?> de <?php echo $totalPages; ?></span>
+        <?php if ($page < $totalPages): ?>
+            <a href="<?php echo htmlspecialchars($buildPageUrl($page + 1)); ?>" class="btn-secondary">Próxima &rarr;</a>
+        <?php endif; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if ($cursorMode && $nextCursor !== ''): ?>
+<section class="container sales-pagination-section">
+    <div class="sales-pagination-inline sales-pagination-inline-bottom">
+        <a href="<?php echo htmlspecialchars($buildCursorUrl($nextCursor)); ?>" class="btn-secondary">Próxima &rarr;</a>
+    </div>
+</section>
+<?php endif; ?>
 
 </div>

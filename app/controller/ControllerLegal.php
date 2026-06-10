@@ -12,7 +12,7 @@ class ControllerLegal
         $this->renderPage(
             'cookies',
             'Política de Cookies — Imobil Fácil',
-            'Saiba como a Imobil Fácil utiliza cookies, como gerir o seu consentimento e quais dados são recolhidos para melhorar a experiência.',
+            'Política de cookies da Imobil Fácil: o que são, para que servem e como gerir o seu consentimento.',
             'cookies',
             'cookies, privacidade, consentimento, imobil facil angola'
         );
@@ -23,7 +23,7 @@ class ControllerLegal
         $this->renderPage(
             'privacidade',
             'Política de Privacidade — Imobil Fácil',
-            'Informação sobre tratamento de dados pessoais na plataforma imobiliária Imobil Fácil, operada em Angola pela Pague Fácil.',
+            'Política de privacidade da Imobil Fácil: dados recolhidos, finalidades e direitos dos utilizadores em Angola.',
             'privacidade',
             'privacidade, dados pessoais, rgpd angola, imobil facil'
         );
@@ -34,7 +34,7 @@ class ControllerLegal
         $this->renderPage(
             'termos',
             'Termos e Condições — Imobil Fácil',
-            'Regras de utilização da plataforma Imobil Fácil: contas, imóveis, solicitações, comissões e responsabilidades dos utilizadores.',
+            'Termos e condições de utilização da Imobil Fácil: contas, anúncios, pedidos e comissões.',
             'termos',
             'termos, condições, regulamento, imobil facil angola'
         );

@@ -41,7 +41,14 @@ if (file_exists($envFile)) {
 
 # Application settings
 define('APP_ENV', Src\classes\ClassEnv::get('APP_ENV', 'development'));
-define('APP_DEBUG', Src\classes\ClassEnv::get('APP_DEBUG', true));
+
+$appDebugRaw = Src\classes\ClassEnv::get('APP_DEBUG', null);
+if ($appDebugRaw === null || $appDebugRaw === '') {
+    define('APP_DEBUG', strtolower((string) APP_ENV) !== 'production');
+} else {
+    define('APP_DEBUG', filter_var($appDebugRaw, FILTER_VALIDATE_BOOLEAN));
+}
+
 define('SESSION_LIFETIME', Src\classes\ClassEnv::get('SESSION_LIFETIME', 1800));
 
 // Prefer a fixed base URL from env to avoid Host header injection.
@@ -88,6 +95,12 @@ define('SMTP_SECURE', Src\classes\ClassEnv::get('SMTP_SECURE', ''));
 
 define('LOG_CHANNEL', Src\classes\ClassEnv::get('LOG_CHANNEL', 'file'));
 define('LOG_LEVEL', Src\classes\ClassEnv::get('LOG_LEVEL', 'info'));
+
+if (strtolower((string) APP_ENV) === 'production' && trim((string) $appUrl) === '') {
+    http_response_code(500);
+    echo 'APP_URL must be set in production.';
+    exit;
+}
 
 if (APP_DEBUG) {
     error_reporting(E_ALL);

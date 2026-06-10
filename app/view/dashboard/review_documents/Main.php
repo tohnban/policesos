@@ -141,7 +141,7 @@
 
                         <div class="doc-queue-actions">
                             <small class="doc-queue-label">Ações</small>
-                            <a href="<?php echo DIRPAGE; ?>storage/documents/<?php echo htmlspecialchars($doc['filename']); ?>"
+                            <a href="<?php echo DIRPAGE; ?>file/serve?path=<?php echo rawurlencode('storage/documents/' . $doc['filename']); ?>"
                                target="_blank" class="doc-action-btn doc-action-view" title="Ver documento">
                                 <i class="fa fa-eye"></i> Ver
                             </a>

@@ -1,6 +1,28 @@
 RewriteEngine on
+
+# Block direct access to environment files.
+<FilesMatch "^\.env">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
+
+# Block internal paths (must go through front controller / file/serve).
+RewriteRule ^(config|app|src|storage/logs|storage/cache|storage/documents)/ - [F,L]
+
+# Favicon na raiz do domínio (pedido automático dos browsers).
+RewriteRule ^favicon\.ico$ public/img/favicon.ico [L]
+
 # Pass Authorization header to PHP (Apache/CGI often strips it).
 RewriteCond %{HTTP:Authorization} .
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ /public/index.php?url=$1 [QSA,L]
+
+# Block direct web access to internal PHP/bootstrap files at project root.
+<FilesMatch "^(phpstan-bootstrap)\.php$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>

@@ -25,6 +25,7 @@ class AuthRegisterFeedback
     public const PASSWORD_SHORT = 'password_short';
     public const PASSWORD_MISMATCH = 'password_mismatch';
     public const PROFILE_PHOTO_INVALID = 'profile_photo_invalid';
+    public const TERMS_NOT_ACCEPTED = 'terms_not_accepted';
     public const CREATE_FAILED = 'create_failed';
 
     private const MESSAGES = [
@@ -32,7 +33,7 @@ class AuthRegisterFeedback
         self::NAME_REQUIRED => 'Indique o seu nome ou razão social.',
         self::USER_TYPE_REQUIRED => 'Seleccione pessoa física ou jurídica.',
         self::DOCUMENT_REQUIRED => 'Indique o número de BI ou NIF.',
-        self::DOCUMENT_BI_INVALID => 'O BI/NIF de pessoa singular deve ter exactamente 14 dígitos.',
+        self::DOCUMENT_BI_INVALID => 'Indique um BI ou NIF válido (letras e números, como no documento).',
         self::DOCUMENT_NIF_INVALID => 'O NIF de pessoa colectiva deve ter exactamente 10 dígitos.',
         self::DOCUMENT_TAKEN => 'Este número de identificação já está registado.',
         self::DOCUMENT_FILE_REQUIRED => 'Envie o documento de identificação (PDF ou imagem).',
@@ -46,6 +47,7 @@ class AuthRegisterFeedback
         self::PASSWORD_SHORT => 'A senha deve ter pelo menos 6 caracteres.',
         self::PASSWORD_MISMATCH => 'A confirmação de senha não coincide.',
         self::PROFILE_PHOTO_INVALID => 'Não foi possível usar a foto de perfil seleccionada.',
+        self::TERMS_NOT_ACCEPTED => 'Deve aceitar os Termos e Condições e a Política de Privacidade para criar conta.',
         self::CREATE_FAILED => 'Não foi possível criar a conta. Tente novamente mais tarde.',
     ];
 

@@ -1,11 +1,82 @@
 <div class="container dashboard-view dashboard-profile-view">
+    <?php $isAdminProfile = !empty($isAdminProfile); ?>
     <section class="dashboard-view-hero compact">
         <div>
             <span class="dashboard-hero-kicker">Conta</span>
-            <h1>Meu Perfil</h1>
-            <p>Atualize dados, segurança e estado de confiança da sua conta.</p>
+            <h1><?php echo $isAdminProfile ? 'Segurança da conta' : 'Meu Perfil'; ?></h1>
+            <p><?php echo $isAdminProfile
+                ? 'Actualize a sua foto e palavra-passe quando precisar.'
+                : 'Atualize dados, segurança e estado de confiança da sua conta.'; ?></p>
         </div>
     </section>
+
+    <?php if ($isAdminProfile): ?>
+        <?php $accountRoleLabel = Src\classes\ClassAccess::roleLabel($user ?? null); ?>
+        <div class="dashboard-profile-layout dashboard-profile-layout-admin">
+            <aside class="dashboard-home-side dashboard-profile-avatar-panel">
+                <div class="dashboard-module-card">
+                    <div class="dashboard-module-head compact">
+                        <div>
+                            <span class="dashboard-module-kicker">Equipa</span>
+                            <h3>A sua conta</h3>
+                        </div>
+                    </div>
+                    <div class="profile-photo-section dashboard-margin-bottom-reset">
+                        <?php if (!empty($user['profile_photo'])): ?>
+                            <img src="<?php echo htmlspecialchars($user['profile_photo']); ?>" alt="<?php echo htmlspecialchars($user['name']); ?>" class="profile-photo-display">
+                        <?php else: ?>
+                            <div class="profile-photo-placeholder">
+                                <i class="fa fa-user"></i>
+                            </div>
+                        <?php endif; ?>
+                        <h4 class="profile-side-name"><?php echo htmlspecialchars(Src\classes\UserDisplay::publicLabel($user)); ?></h4>
+                        <?php if (!empty($user['username'])): ?>
+                            <p class="profile-side-handle">@<?php echo htmlspecialchars((string) $user['username']); ?></p>
+                        <?php endif; ?>
+                        <p class="profile-side-role"><?php echo htmlspecialchars($accountRoleLabel); ?></p>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="dashboard-profile-stack">
+                <div class="dashboard-module-card dashboard-form-shell">
+                    <div class="dashboard-module-head compact">
+                        <div>
+                            <span class="dashboard-module-kicker">Conta</span>
+                            <h3>Foto e palavra-passe</h3>
+                        </div>
+                    </div>
+                    <form action="<?php echo DIRPAGE; ?>profile/update" method="POST" enctype="multipart/form-data" class="profile-update-form profile-update-form-admin">
+                        <?php echo Src\classes\ClassCsrf::field(); ?>
+                        <fieldset class="profile-form-section">
+                            <legend class="profile-form-section-title">Foto de perfil</legend>
+                            <div class="form-group">
+                                <label for="profile_photo">Nova foto (opcional)</label>
+                                <input type="file" id="profile_photo" name="profile_photo" accept="image/jpeg,image/png,image/gif,image/webp">
+                                <small class="dashboard-inline-note">JPG, PNG, GIF ou WebP. Máximo 2 MB.</small>
+                            </div>
+                        </fieldset>
+                        <fieldset class="profile-form-section">
+                            <legend class="profile-form-section-title">Palavra-passe</legend>
+                            <div class="form-group">
+                                <label for="current_password">Palavra-passe actual *</label>
+                                <input type="password" id="current_password" name="current_password" required autocomplete="current-password">
+                            </div>
+                            <div class="form-group">
+                                <label for="new_password">Nova palavra-passe (opcional)</label>
+                                <input type="password" id="new_password" name="new_password" minlength="6" autocomplete="new-password" placeholder="Deixe em branco para manter a actual">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm_password">Confirmar nova palavra-passe</label>
+                                <input type="password" id="confirm_password" name="confirm_password" minlength="6" autocomplete="new-password">
+                            </div>
+                        </fieldset>
+                        <button type="submit" class="btn-primary">Guardar alterações</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <?php else: ?>
 
     <?php
         $trustUserId = (int) ($user['id'] ?? 0);
@@ -377,4 +448,5 @@
         </div>
         </div>
     </div>
+    <?php endif; ?>
 </div>

@@ -66,6 +66,22 @@ $waLink = $ownerPhoneDigits !== '' ? ('https://wa.me/' . $ownerPhoneDigits . '?t
             <span><i class="fa fa-bed"></i> <?php echo (int) ($property['bedrooms'] ?? 0); ?> quartos</span>
             <span><i class="fa fa-bath"></i> <?php echo (int) ($property['bathrooms'] ?? 0); ?> banhos</span>
         </div>
+        <div class="sales-trust-row">
+            <?php $ownerHandle = htmlspecialchars(Src\classes\UserDisplay::publicHandleFromRow($property, 'owner_username', 'owner_name', 'Proprietário')); ?>
+            <span><i class="fa fa-user"></i>
+                <?php if (!empty($property['affiliate_id'])): ?>
+                    <a href="<?php echo htmlspecialchars(Src\classes\ClassPlan::getPublicProfileUrl((int) $property['affiliate_id'])); ?>" class="owner-name-link"><?php echo $ownerHandle; ?></a>
+                <?php else: ?>
+                    <?php echo $ownerHandle; ?>
+                <?php endif; ?>
+            </span>
+            <?php if (!empty($property['owner_verified'])): ?>
+                <span class="sales-trust-chip verified"><i class="fa fa-check-circle"></i> Verificado</span>
+            <?php endif; ?>
+            <?php if (!empty($property['owner_trusted'])): ?>
+                <span class="sales-trust-chip trusted"><i class="fa fa-shield"></i> Confiança</span>
+            <?php endif; ?>
+        </div>
         <div class="sales-carousel-actions">
             <a href="<?php echo DIRPAGE; ?>property/<?php echo (int) $property['id']; ?>" class="btn-primary sales-card-cta">Ver este imóvel</a>
             <?php if ($waLink !== ''): ?>

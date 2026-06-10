@@ -114,10 +114,10 @@
                 <p class="dashboard-inline-note">Selecione um método para carregar os campos correspondentes.</p>
             </div>
 
-            <div class="form-group form-group-checkbox">
-                <label>
-                    <input type="checkbox" name="is_default" value="1">
-                    Definir como conta padrão
+            <div class="form-group form-group-checkbox payment-accounts-default-choice">
+                <label class="payment-accounts-checkbox-label" for="payment_account_is_default">
+                    <input type="checkbox" name="is_default" id="payment_account_is_default" value="1">
+                    <span>Usar como conta principal para receber pagamentos</span>
                 </label>
             </div>
 

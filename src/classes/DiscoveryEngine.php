@@ -5,6 +5,7 @@ namespace Src\classes;
 use App\model\ManipularBanco;
 use App\model\Property;
 use App\model\PropertyImpression;
+use App\model\User;
 
 class DiscoveryEngine
 {
@@ -598,7 +599,9 @@ class DiscoveryEngine
             $requestParams[] = $viewerUserId;
         }
 
-        $sql = "SELECT p.*, u.username AS owner_username, u.name AS owner_name, u.phone AS owner_phone, lv.last_viewed_at
+        $sql = "SELECT p.*, u.username AS owner_username, u.name AS owner_name, u.phone AS owner_phone,
+                CASE WHEN u.status = 'ativo' THEN 1 ELSE 0 END AS owner_verified,
+                " . User::sqlOwnerTrustedColumn('u') . ", lv.last_viewed_at
                 FROM properties p
                 INNER JOIN (
                     SELECT property_id, MAX(created_at) AS last_viewed_at

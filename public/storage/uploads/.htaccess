@@ -1,0 +1,4 @@
+# Comprovativos e anexos — servir apenas via /file/serve (autenticado).
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>

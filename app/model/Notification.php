@@ -74,6 +74,135 @@ class Notification extends ManipularBanco
         return $labels[$type] ?? 'Notificação';
     }
 
+    public static function typeIcon(string $type): string
+    {
+        $icons = [
+            'new_request' => 'fa-inbox',
+            'request_status_updated' => 'fa-exchange',
+            'request_cancelled' => 'fa-ban',
+            'request_closing_confirmed' => 'fa-check-circle',
+            'request_closing_contested' => 'fa-exclamation-triangle',
+            'request_payment_declared' => 'fa-credit-card',
+            'request_payment_receipt_confirmed' => 'fa-check-circle',
+            'request_payment_contested' => 'fa-exclamation-triangle',
+            'request_chat_message' => 'fa-comments',
+            'request_sla_reminder' => 'fa-clock-o',
+            'commission_paid' => 'fa-money',
+            'trusted_badge_requested' => 'fa-shield',
+            'trusted_badge_approved' => 'fa-shield',
+            'trusted_badge_rejected' => 'fa-shield',
+            'trusted_badge_payment_confirmed' => 'fa-shield',
+            'user_approved' => 'fa-user-circle',
+            'user_rejected' => 'fa-user-times',
+            'user_blocked' => 'fa-lock',
+            'user_unblocked' => 'fa-unlock',
+            'admin_role_updated' => 'fa-user',
+            'document_approved' => 'fa-file-text-o',
+            'document_rejected' => 'fa-file-text-o',
+            'document_resubmitted' => 'fa-file-text-o',
+            'boost_request' => 'fa-star',
+            'boost_approved' => 'fa-star',
+            'boost_rejected' => 'fa-star',
+            'affiliate_approved' => 'fa-users',
+            'affiliate_rejected' => 'fa-users',
+            'commission_created' => 'fa-percent',
+            'commission_payment_due' => 'fa-calendar-o',
+            'commission_owner_payment_submitted' => 'fa-upload',
+            'commission_owner_payment_confirmed' => 'fa-check',
+            'commission_owner_payment_rejected' => 'fa-times',
+            'commission_payout_pending' => 'fa-clock-o',
+            'subscription_renewed' => 'fa-refresh',
+            'subscription_payment_failed' => 'fa-exclamation-circle',
+            'subscription_downgraded' => 'fa-level-down',
+        ];
+
+        return $icons[$type] ?? 'fa-bell';
+    }
+
+    public static function typeTone(string $type): string
+    {
+        $tones = [
+            'request_chat_message' => 'tone-chat',
+            'new_request' => 'tone-request',
+            'request_status_updated' => 'tone-request',
+            'request_cancelled' => 'tone-request',
+            'request_closing_confirmed' => 'tone-request',
+            'request_closing_contested' => 'tone-alert',
+            'request_payment_declared' => 'tone-payment',
+            'request_payment_receipt_confirmed' => 'tone-payment',
+            'request_payment_contested' => 'tone-alert',
+            'request_sla_reminder' => 'tone-alert',
+            'commission_paid' => 'tone-payment',
+            'commission_created' => 'tone-payment',
+            'commission_payment_due' => 'tone-payment',
+            'commission_owner_payment_submitted' => 'tone-payment',
+            'commission_owner_payment_confirmed' => 'tone-payment',
+            'commission_owner_payment_rejected' => 'tone-alert',
+            'commission_payout_pending' => 'tone-payment',
+            'trusted_badge_requested' => 'tone-trust',
+            'trusted_badge_approved' => 'tone-trust',
+            'trusted_badge_rejected' => 'tone-trust',
+            'trusted_badge_payment_confirmed' => 'tone-trust',
+            'user_approved' => 'tone-account',
+            'user_rejected' => 'tone-account',
+            'user_blocked' => 'tone-account',
+            'user_unblocked' => 'tone-account',
+            'admin_role_updated' => 'tone-account',
+            'document_approved' => 'tone-document',
+            'document_rejected' => 'tone-document',
+            'document_resubmitted' => 'tone-document',
+            'boost_request' => 'tone-boost',
+            'boost_approved' => 'tone-boost',
+            'boost_rejected' => 'tone-boost',
+            'affiliate_approved' => 'tone-affiliate',
+            'affiliate_rejected' => 'tone-affiliate',
+            'subscription_renewed' => 'tone-plan',
+            'subscription_payment_failed' => 'tone-alert',
+            'subscription_downgraded' => 'tone-plan',
+        ];
+
+        return $tones[$type] ?? 'tone-default';
+    }
+
+    public static function relativeTime(?string $datetime): string
+    {
+        $datetime = $datetime !== null ? trim($datetime) : '';
+        if ($datetime === '') {
+            return '';
+        }
+
+        $timestamp = strtotime($datetime);
+        if ($timestamp === false) {
+            return '';
+        }
+
+        $diff = time() - $timestamp;
+        if ($diff < 45) {
+            return 'agora';
+        }
+        if ($diff < 3600) {
+            $minutes = (int) floor($diff / 60);
+            return 'há ' . $minutes . ' min';
+        }
+        if ($diff < 86400) {
+            $hours = (int) floor($diff / 3600);
+            return 'há ' . $hours . ' h';
+        }
+        if ($diff < 172800) {
+            return 'ontem';
+        }
+        if ($diff < 604800) {
+            $days = (int) floor($diff / 86400);
+            return 'há ' . $days . ' d';
+        }
+        if ($diff < 2592000) {
+            $weeks = (int) floor($diff / 604800);
+            return 'há ' . max(1, $weeks) . ' sem';
+        }
+
+        return date('j M', $timestamp);
+    }
+
     public static function resolveTargetUrl(array $notification): string
     {
         $type = (string) ($notification['type'] ?? '');
@@ -190,10 +319,10 @@ class Notification extends ManipularBanco
             if ($type === 'document_rejected') {
                 return DIRPAGE . 'dashboard#rejected-documents';
             }
-            return DIRPAGE . 'dashboard#notifications';
+            return DIRPAGE . 'notification/inbox';
         }
 
-        return DIRPAGE . 'dashboard#notifications';
+        return DIRPAGE . 'notification/inbox';
     }
 
     public static function actionLabel(string $type): string
@@ -293,10 +422,18 @@ class Notification extends ManipularBanco
 
     public static function enrichRow(array $notification): array
     {
+        $type = (string) ($notification['type'] ?? '');
+        $createdAt = (string) ($notification['created_at'] ?? '');
+
         $notification['metadata'] = self::decodeMetadata($notification['metadata'] ?? null);
-        $notification['type_label'] = self::typeLabel((string) ($notification['type'] ?? ''));
+        $notification['type_label'] = self::typeLabel($type);
+        $notification['type_icon'] = self::typeIcon($type);
+        $notification['type_tone'] = self::typeTone($type);
         $notification['target_url'] = self::resolveTargetUrl($notification);
-        $notification['action_label'] = self::actionLabel((string) ($notification['type'] ?? ''));
+        $notification['action_label'] = self::actionLabel($type);
+        $notification['relative_time'] = self::relativeTime($createdAt);
+        $notification['created_at_label'] = $createdAt !== '' ? date('d/m/Y H:i', strtotime($createdAt)) : '';
+
         return $notification;
     }
 
@@ -330,6 +467,30 @@ class Notification extends ManipularBanco
         }
 
         return ['title' => $title, 'message' => $message];
+    }
+
+    public static function notifyClosingWonPlatformVisit(
+        int $userId,
+        int $requestId,
+        string $propertyTitle,
+        bool $forRequester,
+        ?int $actorId = null
+    ) {
+        $title = 'Fecho ganho — visita e avaliação final';
+        $message = RequestChatMessage::closingWonPlatformVisitNotificationText($forRequester, $propertyTitle);
+
+        return self::notifyUser(
+            $userId,
+            'request_closing_won_platform_visit',
+            $title,
+            $message,
+            [
+                'request_id' => $requestId,
+                'property_title' => $propertyTitle,
+                'for_requester' => $forRequester ? 1 : 0,
+            ],
+            $actorId
+        );
     }
 
     public static function notifyRequestStatusChanged(
@@ -702,10 +863,11 @@ class Notification extends ManipularBanco
         try {
             $db = new self();
             $sql = "UPDATE {$db->table}
-                    SET is_archived = 1, updated_at = NOW()
-                    WHERE id = ? AND user_id = ?";
+                    SET is_archived = 1
+                    WHERE id = ? AND user_id = ? AND is_archived = 0";
             $stmt = $db->prepare($sql);
-            $ok = (bool) $stmt->execute([(int) $notificationId, (int) $userId]);
+            $stmt->execute([(int) $notificationId, (int) $userId]);
+            $ok = $stmt->rowCount() > 0;
             if ($ok) {
                 \App\services\HeaderShellService::invalidateNotifications((int) $userId);
             }
@@ -720,10 +882,11 @@ class Notification extends ManipularBanco
         try {
             $db = new self();
             $sql = "UPDATE {$db->table}
-                    SET is_archived = 1, updated_at = NOW()
+                    SET is_archived = 1
                     WHERE user_id = ? AND is_archived = 0";
             $stmt = $db->prepare($sql);
-            $ok = (bool) $stmt->execute([$userId]);
+            $stmt->execute([$userId]);
+            $ok = $stmt->rowCount() > 0;
             if ($ok) {
                 \App\services\HeaderShellService::invalidateNotifications((int) $userId);
             }
@@ -738,10 +901,11 @@ class Notification extends ManipularBanco
         try {
             $db = new self();
             $sql = "UPDATE {$db->table}
-                    SET is_archived = 0, updated_at = NOW()
+                    SET is_archived = 0
                     WHERE id = ? AND user_id = ? AND is_archived = 1";
             $stmt = $db->prepare($sql);
-            return (bool) $stmt->execute([(int) $notificationId, (int) $userId]);
+            $stmt->execute([(int) $notificationId, (int) $userId]);
+            return $stmt->rowCount() > 0;
         } catch (\Throwable $e) {
             return false;
         }

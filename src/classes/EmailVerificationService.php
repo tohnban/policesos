@@ -100,7 +100,7 @@ class EmailVerificationService
             . "{$verifyLink}\n\n"
             . 'O link é válido por ' . self::TOKEN_TTL_HOURS . ' horas.';
 
-        ClassMailer::sendQueued(
+        ClassMailer::sendTransactional(
             $newEmail,
             $recipientName,
             $subject,

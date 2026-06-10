@@ -12,8 +12,12 @@ tmp_cookie.txt
 
 # Runtime uploads (generated locally)
 public/storage/uploads/**
+!public/storage/uploads/.htaccess
 storage/uploads/**
 
 # Local migration/sync artifacts
 antigo/
 sync_report.txt
+
+# Pacote gerado para upload ao servidor
+deploy/

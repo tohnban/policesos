@@ -165,7 +165,25 @@ class User extends ManipularBanco
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         $data['status'] = 'pendente'; // Usuários ficam pendentes até aprovação
         $data['created_at'] = date('Y-m-d H:i:s');
-        return $db->Salvar($data, $db->table);
+        unset($data['password_confirm']);
+
+        $allowedColumns = [
+            'email',
+            'password',
+            'name',
+            'username',
+            'user_type',
+            'document_number',
+            'phone',
+            'is_affiliate',
+            'affiliate_code',
+            'status',
+            'document_file',
+            'profile_photo',
+            'created_at',
+        ];
+
+        return $db->insert($db->table, $data, $allowedColumns);
     }
 
     public static function validateData($data)
@@ -206,8 +224,11 @@ class User extends ManipularBanco
         }
         if (empty($docNumber)) {
             $errors[] = \Src\classes\AuthRegisterFeedback::DOCUMENT_REQUIRED;
-        } elseif ($userType === 'pessoa_fisica' && !preg_match('/^\d{14}$/', $docNumber)) {
-            $errors[] = \Src\classes\AuthRegisterFeedback::DOCUMENT_BI_INVALID;
+        } elseif ($userType === 'pessoa_fisica') {
+            $docCompact = preg_replace('/[^A-Za-z0-9]/', '', $docNumber);
+            if (strlen($docCompact) < 5 || strlen($docCompact) > 24 || !preg_match('/^[A-Za-z0-9\s.\-\/]+$/', $docNumber)) {
+                $errors[] = \Src\classes\AuthRegisterFeedback::DOCUMENT_BI_INVALID;
+            }
         } elseif ($userType === 'pessoa_juridica' && !preg_match('/^\d{10}$/', $docNumber)) {
             $errors[] = \Src\classes\AuthRegisterFeedback::DOCUMENT_NIF_INVALID;
         }
@@ -437,7 +458,7 @@ class User extends ManipularBanco
     public static function getAdministrativeUsers(): array
     {
         $db = new self();
-        $sql = "SELECT id, name, email, phone, role, status, is_admin, created_at
+        $sql = "SELECT id, name, email, phone, role, status, is_admin, suspended_until, created_at
                 FROM {$db->table}
                 WHERE is_admin = 1
                    OR role IN ('super_admin', 'moderador', 'financeiro', 'suporte')
@@ -476,6 +497,164 @@ class User extends ManipularBanco
         $stmt = $db->prepare($sql);
         $stmt->execute();
         return (int) $stmt->fetchColumn();
+    }
+
+    public static function isAdministrativeUser(?array $user): bool
+    {
+        if (!is_array($user)) {
+            return false;
+        }
+
+        if (!empty($user['is_admin'])) {
+            return true;
+        }
+
+        $role = strtolower(trim((string) ($user['role'] ?? '')));
+
+        return in_array($role, ['super_admin', 'moderador', 'financeiro', 'suporte'], true);
+    }
+
+    /**
+     * @return array{ok:bool, error?:string, user_id?:int}
+     */
+    public static function createAdministrativeUser(array $data): array
+    {
+        $name = trim((string) ($data['name'] ?? ''));
+        $email = strtolower(trim((string) ($data['email'] ?? '')));
+        $phone = \Src\classes\PhoneHelper::normalize(trim((string) ($data['phone'] ?? '')));
+        $password = (string) ($data['password'] ?? '');
+        $passwordConfirm = (string) ($data['password_confirm'] ?? '');
+        $role = strtolower(trim((string) ($data['role'] ?? '')));
+
+        if ($name === '') {
+            return ['ok' => false, 'error' => 'Indique o nome do administrador.'];
+        }
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ['ok' => false, 'error' => 'Email inválido.'];
+        }
+        if (self::findByEmail($email)) {
+            return ['ok' => false, 'error' => 'Este email já está registado.'];
+        }
+        if ($phone === '') {
+            return ['ok' => false, 'error' => 'Indique um telefone válido.'];
+        }
+        if (self::findByPhone($phone)) {
+            return ['ok' => false, 'error' => 'Este telefone já está registado.'];
+        }
+        if (strlen($password) < 6) {
+            return ['ok' => false, 'error' => 'A palavra-passe deve ter pelo menos 6 caracteres.'];
+        }
+        if ($password !== $passwordConfirm) {
+            return ['ok' => false, 'error' => 'As palavras-passe não coincidem.'];
+        }
+
+        $allowedRoles = ['super_admin', 'moderador', 'financeiro', 'suporte'];
+        if (!in_array($role, $allowedRoles, true)) {
+            return ['ok' => false, 'error' => 'Papel administrativo inválido.'];
+        }
+
+        $documentNumber = self::generateInternalAdminDocumentNumber();
+        $now = date('Y-m-d H:i:s');
+
+        $payload = [
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'username' => \Src\classes\UsernameHelper::generateUniqueFromName($name),
+            'user_type' => 'pessoa_fisica',
+            'document_number' => $documentNumber,
+            'is_affiliate' => 0,
+            'is_admin' => 1,
+            'role' => $role,
+            'status' => 'ativo',
+            'email_verified_at' => $now,
+            'created_at' => $now,
+        ];
+
+        $db = new self();
+        $insertId = $db->insert($db->table, $payload, [
+            'name',
+            'email',
+            'phone',
+            'password',
+            'username',
+            'user_type',
+            'document_number',
+            'is_affiliate',
+            'is_admin',
+            'role',
+            'status',
+            'email_verified_at',
+            'created_at',
+        ]);
+
+        if (!$insertId) {
+            return ['ok' => false, 'error' => 'Não foi possível criar a conta administrativa.'];
+        }
+
+        return ['ok' => true, 'user_id' => (int) $insertId];
+    }
+
+    public static function revokeAdministrativeAccess(int $userId): bool
+    {
+        $db = new self();
+        $sql = "UPDATE {$db->table}
+                SET role = 'utilizador',
+                    is_admin = 0,
+                    suspended_until = NULL,
+                    status = 'ativo'
+                WHERE id = ?
+                  AND (is_admin = 1 OR role IN ('super_admin', 'moderador', 'financeiro', 'suporte'))";
+        $stmt = $db->prepare($sql);
+
+        return $stmt->execute([$userId]) && $stmt->rowCount() > 0;
+    }
+
+    public static function suspendAdministrativeAccess(int $userId, int $days): bool
+    {
+        if ($days < 1) {
+            return false;
+        }
+
+        $until = date('Y-m-d H:i:s', strtotime('+' . $days . ' days'));
+        $db = new self();
+        $sql = "UPDATE {$db->table}
+                SET suspended_until = ?, status = 'ativo'
+                WHERE id = ?
+                  AND (is_admin = 1 OR role IN ('super_admin', 'moderador', 'financeiro', 'suporte'))";
+        $stmt = $db->prepare($sql);
+
+        return $stmt->execute([$until, $userId]) && $stmt->rowCount() > 0;
+    }
+
+    public static function unsuspendAdministrativeAccess(int $userId): bool
+    {
+        $db = new self();
+        $sql = "UPDATE {$db->table}
+                SET suspended_until = NULL
+                WHERE id = ?
+                  AND (is_admin = 1 OR role IN ('super_admin', 'moderador', 'financeiro', 'suporte'))";
+        $stmt = $db->prepare($sql);
+
+        return $stmt->execute([$userId]) && $stmt->rowCount() > 0;
+    }
+
+    private static function generateInternalAdminDocumentNumber(): string
+    {
+        for ($attempt = 0; $attempt < 8; $attempt++) {
+            try {
+                $suffix = strtoupper(bin2hex(random_bytes(6)));
+            } catch (\Throwable $e) {
+                $suffix = strtoupper(substr(md5(uniqid('', true)), 0, 12));
+            }
+            $candidate = 'ADM' . substr($suffix, 0, 11);
+            if (!self::findByDocumentNumber($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return 'ADM' . strtoupper(substr((string) time(), -11));
     }
 
     public static function approveUser($id)

@@ -35,23 +35,48 @@
     $ownerProfileId = (int) ($request['owner_id'] ?? 0);
     $requesterHandle = Src\classes\UserDisplay::publicHandleFromRow($request, 'requester_username', 'requester_name');
     $ownerHandle = Src\classes\UserDisplay::publicHandleFromRow($request, 'owner_username', 'owner_name');
+
+    $hasMessagesFromOthers = false;
+    foreach ($messages as $chatMessage) {
+        if ((int) ($chatMessage['sender_user_id'] ?? 0) !== $currentUserId) {
+            $hasMessagesFromOthers = true;
+            break;
+        }
+    }
 ?>
 
 <div class="request-chats-conversation-inner">
     <div class="request-chats-conversation-toolbar">
         <?php if ($listBackUrl !== ''): ?>
-            <a href="<?php echo htmlspecialchars($listBackUrl); ?>" class="request-chats-back-list btn-secondary">
+            <a href="<?php echo htmlspecialchars($listBackUrl); ?>" class="request-chats-back-list notification-inbox-text-btn">
                 <i class="fa fa-arrow-left" aria-hidden="true"></i> Conversas
             </a>
         <?php endif; ?>
         <div class="request-chats-conversation-heading">
             <h3><?php echo htmlspecialchars((string) ($request['title'] ?? 'Negociação')); ?></h3>
-            <span class="dashboard-inline-note">#<?php echo $requestId; ?></span>
+            <span class="request-chats-conversation-id">#<?php echo $requestId; ?></span>
+        </div>
+        <div class="request-chats-conversation-toolbar-actions">
+            <?php if ($hasMessagesFromOthers): ?>
+                <button type="button"
+                        class="request-chats-mark-unread-btn notification-inbox-text-btn"
+                        data-request-id="<?php echo $requestId; ?>">
+                    Marcar como não lida
+                </button>
+            <?php endif; ?>
+            <button type="button"
+                    class="request-chats-context-toggle"
+                    id="requestChatsContextToggle"
+                    aria-expanded="false"
+                    aria-controls="requestChatsContextCard">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <span>Contexto</span>
+            </button>
         </div>
     </div>
 
-    <article class="dispute-summary-card request-chats-context-card">
-        <span class="dashboard-module-kicker">Contexto</span>
+    <article class="dispute-summary-card request-chats-context-card" id="requestChatsContextCard">
+        <span class="request-chats-context-kicker">Contexto</span>
         <p><strong>Solicitante:</strong>
             <?php if ($requesterProfileId > 0): ?>
                 <a href="<?php echo DIRPAGE; ?>property/owner/<?php echo $requesterProfileId; ?>" class="table-name-link"><?php echo htmlspecialchars($requesterHandle); ?></a>
@@ -127,7 +152,7 @@
                         $isSystem = (string) ($message['message_type'] ?? 'text') === 'system';
                         $senderName = Src\classes\UserDisplay::publicHandleFromRow($message, 'sender_username', 'sender_name', 'Utilizador');
                         $senderUserId = (int) ($message['sender_user_id'] ?? 0);
-                        $messageText = (string) ($message['message_text'] ?? '');
+                        $messageText = App\model\RequestChatMessage::displayText((string) ($message['message_text'] ?? ''));
                         $attachmentPath = (string) ($message['attachment_path'] ?? '');
                         $createdAt = (string) ($message['created_at'] ?? '');
                     ?>

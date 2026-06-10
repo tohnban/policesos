@@ -211,7 +211,7 @@
                             <td>
                                 <div class="moderation-actions">
                                     <?php if ($docFilename !== ''): ?>
-                                        <a href="<?php echo DIRPAGE; ?>storage/documents/<?php echo htmlspecialchars($docFilename); ?>" target="_blank" rel="noopener" class="btn-secondary">Ver doc.</a>
+                                        <a href="<?php echo DIRPAGE; ?>file/serve?path=<?php echo rawurlencode('storage/documents/' . $docFilename); ?>" target="_blank" rel="noopener" class="btn-secondary">Ver doc.</a>
                                     <?php endif; ?>
                                     <a href="<?php echo htmlspecialchars($reviewUrl); ?>" class="btn-secondary">Revisão</a>
                                     <form action="<?php echo DIRPAGE; ?>dashboard/approveUser/<?php echo $user['id']; ?>" method="POST">
@@ -493,7 +493,53 @@
         <div class="dashboard-module-head compact">
             <div>
                 <span class="dashboard-module-kicker">Administração Principal</span>
-                <h3>Gestão de Papéis Administrativos</h3>
+                <h3>Criar conta administrativa</h3>
+                <p class="dashboard-inline-note">Contas criadas aqui ficam activas de imediato, com email confirmado. Comunique a palavra-passe ao novo membro por canal seguro.</p>
+            </div>
+        </div>
+
+        <form action="<?php echo DIRPAGE; ?>dashboard/createAdministrativeUser" method="POST" class="auth-form-grid auth-form-grid-register dashboard-admin-create-form">
+            <?php echo $csrfField; ?>
+            <div class="form-group">
+                <label for="admin_create_name">Nome completo *</label>
+                <input type="text" id="admin_create_name" name="name" required autocomplete="name" placeholder="Ex.: Joana Suporte">
+            </div>
+            <div class="form-group">
+                <label for="admin_create_email">Email *</label>
+                <input type="email" id="admin_create_email" name="email" required autocomplete="email" placeholder="admin@exemplo.com">
+            </div>
+            <div class="form-group">
+                <label for="admin_create_phone">Telefone *</label>
+                <input type="tel" id="admin_create_phone" name="phone" required autocomplete="tel" placeholder="+244 9XX XXX XXX">
+            </div>
+            <div class="form-group">
+                <label for="admin_create_role">Papel *</label>
+                <select id="admin_create_role" name="role" required>
+                    <?php foreach ($adminRoleOptions as $roleKey => $roleLabel): ?>
+                        <option value="<?php echo htmlspecialchars((string) $roleKey); ?>"><?php echo htmlspecialchars((string) $roleLabel); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="admin_create_password">Palavra-passe *</label>
+                <input type="password" id="admin_create_password" name="password" required minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+            </div>
+            <div class="form-group">
+                <label for="admin_create_password_confirm">Confirmar palavra-passe *</label>
+                <input type="password" id="admin_create_password_confirm" name="password_confirm" required minlength="6" autocomplete="new-password">
+            </div>
+            <div class="form-group auth-form-span-full">
+                <button type="submit" class="btn-primary" data-confirm="Criar esta conta administrativa?">Criar conta admin</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="dashboard-module-card dashboard-kpi-section">
+        <div class="dashboard-module-head compact">
+            <div>
+                <span class="dashboard-module-kicker">Equipa</span>
+                <h3>Gestão de Papéis e Restrições</h3>
+                <p class="dashboard-inline-note">Altere papéis, suspenda acessos ou revogue privilégios administrativos. Não é possível restringir o último Admin Total activo.</p>
             </div>
         </div>
 
@@ -505,16 +551,24 @@
                     <th>Email</th>
                     <th>Telefone</th>
                     <th>Estado</th>
-                    <th>Papel atual</th>
+                    <th>Acesso</th>
+                    <th>Papel actual</th>
                     <th>Alterar papel</th>
+                    <th>Restrições</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (!empty($administrativeUsers)): ?>
                     <?php foreach ($administrativeUsers as $adminMember): ?>
-                        <?php $memberRole = (string) ($adminMember['role'] ?? 'utilizador'); ?>
+                        <?php
+                            $memberRole = (string) ($adminMember['role'] ?? 'utilizador');
+                            $memberId = (int) ($adminMember['id'] ?? 0);
+                            $memberSuspendedUntil = !empty($adminMember['suspended_until']) ? strtotime((string) $adminMember['suspended_until']) : null;
+                            $memberIsSuspended = $memberSuspendedUntil !== null && $memberSuspendedUntil > time();
+                            $isSelf = $memberId === (int) ($user['id'] ?? 0);
+                        ?>
                         <tr>
-                            <td class="moderation-cell-text"><a href="<?php echo DIRPAGE; ?>property/owner/<?php echo (int) ($adminMember['id'] ?? 0); ?>" class="table-name-link"><?php echo htmlspecialchars((string) ($adminMember['name'] ?? '-')); ?></a></td>
+                            <td class="moderation-cell-text"><a href="<?php echo DIRPAGE; ?>property/owner/<?php echo $memberId; ?>" class="table-name-link"><?php echo htmlspecialchars((string) ($adminMember['name'] ?? '-')); ?></a></td>
                             <td class="moderation-cell-text"><?php echo htmlspecialchars((string) ($adminMember['email'] ?? '-')); ?></td>
                             <td class="moderation-cell-text"><?php echo htmlspecialchars((string) ($adminMember['phone'] ?? '-')); ?></td>
                             <td>
@@ -527,9 +581,17 @@
                                     <span class="request-status-badge request-status-pendente">Pendente</span>
                                 <?php endif; ?>
                             </td>
+                            <td>
+                                <?php if ($memberIsSuspended): ?>
+                                    <span class="request-status-badge request-status-cancelado">Suspenso até <?php echo date('d/m/Y', $memberSuspendedUntil); ?></span>
+                                <?php else: ?>
+                                    <span class="request-status-badge request-status-aceite">Normal</span>
+                                <?php endif; ?>
+                            </td>
                             <td><?php echo htmlspecialchars(Src\classes\ClassAccess::roleLabel($adminMember)); ?></td>
                             <td>
-                                <form action="<?php echo DIRPAGE; ?>dashboard/setAdminRole/<?php echo (int) ($adminMember['id'] ?? 0); ?>" method="POST" class="moderation-actions">
+                                <?php if (!$isSelf): ?>
+                                <form action="<?php echo DIRPAGE; ?>dashboard/setAdminRole/<?php echo $memberId; ?>" method="POST" class="moderation-actions">
                                     <?php echo $csrfField; ?>
                                     <select name="role" class="request-history-filter-select" style="min-width:170px;">
                                         <?php foreach ($adminRoleOptions as $roleKey => $roleLabel): ?>
@@ -538,14 +600,39 @@
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <button type="submit" class="btn-secondary" data-confirm="Atualizar o papel administrativo deste utilizador?">Atualizar papel</button>
+                                    <button type="submit" class="btn-secondary" data-confirm="Atualizar o papel administrativo deste utilizador?">Atualizar</button>
                                 </form>
+                                <?php else: ?>
+                                    <span class="dashboard-inline-note">Conta actual</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if ($isSelf): ?>
+                                    <span class="dashboard-inline-note">—</span>
+                                <?php elseif ($memberIsSuspended): ?>
+                                    <form action="<?php echo DIRPAGE; ?>dashboard/unsuspendAdministrativeAccess/<?php echo $memberId; ?>" method="POST" class="moderation-actions">
+                                        <?php echo $csrfField; ?>
+                                        <button type="submit" class="btn-secondary" data-confirm="Levantar a suspensão deste administrador?">Levantar suspensão</button>
+                                    </form>
+                                <?php else: ?>
+                                    <div class="moderation-actions">
+                                        <form action="<?php echo DIRPAGE; ?>dashboard/suspendAdministrativeAccess/<?php echo $memberId; ?>" method="POST" class="request-actions" style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                            <?php echo $csrfField; ?>
+                                            <input type="number" name="suspend_days" min="1" max="365" value="30" class="request-history-filter-select" style="width:88px;" aria-label="Dias de suspensão">
+                                            <button type="submit" class="btn-secondary" data-confirm="Suspender o acesso administrativo deste utilizador?">Suspender</button>
+                                        </form>
+                                        <form action="<?php echo DIRPAGE; ?>dashboard/revokeAdministrativeAccess/<?php echo $memberId; ?>" method="POST">
+                                            <?php echo $csrfField; ?>
+                                            <button type="submit" class="dashboard-btn-danger" data-confirm="Revogar o acesso administrativo? A conta passará a ser de utilizador normal.">Revogar admin</button>
+                                        </form>
+                                    </div>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="6">Nenhum membro administrativo encontrado.</td>
+                        <td colspan="8">Nenhum membro administrativo encontrado.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

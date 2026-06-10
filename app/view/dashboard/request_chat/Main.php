@@ -108,7 +108,7 @@
                             $isOwn = (int) ($message['sender_user_id'] ?? 0) === $currentUserId;
                             $isSystem = (string) ($message['message_type'] ?? 'text') === 'system';
                             $senderName = (string) ($message['sender_name'] ?? 'Utilizador');
-                            $messageText = (string) ($message['message_text'] ?? '');
+                            $messageText = App\model\RequestChatMessage::displayText((string) ($message['message_text'] ?? ''));
                             $attachmentPath = (string) ($message['attachment_path'] ?? '');
                             $createdAt = (string) ($message['created_at'] ?? '');
                         ?>

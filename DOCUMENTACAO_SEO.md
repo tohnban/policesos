@@ -30,6 +30,8 @@ ClassSEO::SITE_COUNTRY        // AO
 ClassSEO::DEFAULT_CURRENCY    // AOA
 ClassSEO::DEFAULT_KEYWORDS    // imóveis angola, ...
 ClassSEO::defaultOgImage()    // public/img/logo-imobilfacil.png
+ClassSEO::faviconIcoUrl()     // public/img/favicon.ico (+ rewrite /favicon.ico)
+ClassSEO::faviconPngUrl()     // public/img/favicon.png
 ```
 
 **Produção:** defina `APP_URL` no `.env` (ex.: `https://www.imobilfacil.ao/`) para canonical, OG, sitemap e robots usarem o domínio correcto.

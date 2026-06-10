@@ -1,146 +1,174 @@
 <?php
-$legalKicker = 'Base legal';
-$legalTitle = 'Termos e Condições de Utilização';
-$legalLead = 'Regras que regem o uso da Imobil Fácil por proprietários, interessados, afiliados e visitantes — leia antes de publicar imóveis ou criar solicitações.';
+$legalKicker = 'Informação útil';
+$legalTitle = 'Termos e Condições';
+$legalLead = 'Regras de utilização da Imobil Fácil para proprietários, quem procura imóvel, afiliados e visitantes.';
+
+ob_start();
+?>
+<h4>Diplomas de referência</h4>
+<ul>
+    <li>Constituição da República de Angola — artigo 32.º, n.º 2.</li>
+    <li>Lei n.º 1/07, de 14 de Maio — Lei das Actividades Comerciais (comércio electrónico, artigo 13.º).</li>
+    <li>Lei n.º 15/03, de 22 de Julho — Lei de Defesa do Consumidor (artigos 20.º a 22.º).</li>
+    <li>Lei n.º 23/11, de 20 de Junho — LCE (contratação electrónica, artigo 28.º).</li>
+    <li>Lei n.º 22/11, de 17 de Junho — LPDP (dados pessoais no âmbito da conta e dos pedidos).</li>
+    <li>Código Civil e demais legislação aplicável a contratos e responsabilidade civil.</li>
+</ul>
+<h4>Relação com regulamento interno</h4>
+<p>
+    Fluxos de pedidos, comissões e janela de atribuição (em regra 90 dias) seguem também o regulamento
+    operacional da plataforma, sem prejuízo das leis acima citadas.
+</p>
+<?php
+$legalReferencesContent = ob_get_clean();
 ?>
 <div class="container legal-page">
     <?php include DIRREQ . 'app/view/partials/legal_page_hero.php'; ?>
 
-    <article class="dashboard-module-card legal-document" style="padding:1.5rem 2rem; margin-bottom:2rem;">
-        <p class="legal-meta">Última atualização: junho de 2026 · Operador: <strong>Pague Fácil, Comércio e Serviços, LDA</strong></p>
+    <article class="dashboard-module-card legal-document">
+        <?php include DIRREQ . 'app/view/partials/legal_angola_intro.php'; ?>
+
+        <p class="legal-meta">Última actualização: junho de 2026 · <strong>Prestador:</strong> Pague Fácil, Comércio e Serviços, LDA</p>
 
         <h2>1. Aceitação</h2>
         <p>
-            Ao aceder ou utilizar a Imobil Fácil, declara que leu e aceita estes Termos e Condições,
-            a <a href="<?php echo DIRPAGE; ?>privacidade">Política de Privacidade</a> e a
+            Ao usar a Imobil Fácil, aceita estes Termos, a
+            <a href="<?php echo DIRPAGE; ?>privacidade">Política de Privacidade</a> e a
             <a href="<?php echo DIRPAGE; ?>cookies">Política de Cookies</a>.
-            Se não concordar, não deve utilizar a plataforma.
         </p>
 
-        <h2>2. O serviço</h2>
-        <p>
-            A Imobil Fácil é uma plataforma digital de intermediação imobiliária que permite:
-        </p>
+        <h2>2. O que a plataforma faz</h2>
+        <p>Permite:</p>
         <ul>
-            <li>Consultar e filtrar imóveis para venda ou aluguer;</li>
-            <li>Publicar e gerir anúncios (sujeitos a moderação);</li>
-            <li>Criar <strong>solicitações</strong> formais de interesse e acompanhar o seu estado;</li>
-            <li>Comunicar através de canais internos associados aos pedidos;</li>
-            <li>Participar no programa de <strong>afiliados</strong>, quando elegível;</li>
-            <li>Liquidar <strong>comissões</strong> e taxas da plataforma conforme política comercial vigente.</li>
+            <li>Procurar imóveis para comprar ou arrendar;</li>
+            <li>Publicar e gerir anúncios (com moderação quando necessário);</li>
+            <li>Enviar pedidos de interesse e acompanhar o estado;</li>
+            <li>Trocar mensagens no âmbito dos pedidos;</li>
+            <li>Actuar como afiliado, com autorização do proprietário;</li>
+            <li>Pagar comissões e taxas conforme o preçário em vigor.</li>
         </ul>
         <p>
-            A plataforma <strong>não substitui</strong> assessoria jurídica, fiscal ou contratos formais entre as partes
-            fora do âmbito registado. A Pague Fácil facilita o encontro, o trilho comercial e a cobrança de comissões devidas ao modelo.
+            Somos intermediário digital. <strong>Não substituímos</strong> advogado, notário ou contabilista —
+            o contrato final entre comprador e vendedor é da responsabilidade das partes.
         </p>
 
-        <h2>3. Contas e elegibilidade</h2>
+        <h2>3. Informação clara (defesa do consumidor)</h2>
+        <p>
+            Informação sobre imóveis, preços e comissões deve ser <strong>correcta, clara e em português</strong>.
+            Ofertas e publicidade na plataforma vinculam quem as publica, na medida em que fazem parte da relação consigo.
+            São proibidas práticas enganosas ou abusivas.
+        </p>
+
+        <h2>4. Contratos feitos em linha</h2>
+        <p>
+            A criação de conta, aceitação de condições no site e confirmações electrónicas (incluindo afiliação
+            ou estados de pedidos) são válidas como manifestação de vontade nos termos da lei das comunicações electrónicas,
+            sem prejuízo de formalidades especiais que a lei imponha a certos negócios imobiliários.
+        </p>
+
+        <h2>5. A sua conta</h2>
         <ul>
-            <li>Deve fornecer informação verdadeira e mantê-la atualizada no perfil.</li>
-            <li>É responsável pela confidencialidade das credenciais de acesso.</li>
-            <li>Contas podem exigir verificação de documentos ou e-mail antes de funcionalidades plenas.</li>
-            <li>Perfis com incumprimento reiterado, fraude ou risco operacional podem ser limitados, suspensos ou encerrados pela moderação.</li>
-            <li>Planos de subscrição ou selos de confiança têm regras próprias visíveis no painel; o incumprimento pode retirar benefícios associados.</li>
+            <li>Dados verdadeiros e actualizados.</li>
+            <li>Palavra-passe em segredo.</li>
+            <li>Verificação de e-mail ou documentos quando pedida.</li>
+            <li>Possível suspensão por fraude ou incumprimento grave.</li>
+            <li>Planos pagos e selos de confiança com regras no painel.</li>
         </ul>
 
-        <h2>4. Anúncios de imóveis</h2>
+        <h2>6. Anúncios</h2>
         <ul>
-            <li>O proprietário (ou representante autorizado) é responsável pela exatidão de preço, localização, fotos e estado do imóvel.</li>
-            <li>Anúncios passam por estados de moderação (<em>pendente</em>, <em>em análise</em>, <em>disponível</em>, etc.); a plataforma pode recusar ou remover conteúdo inadequado.</li>
-            <li>É proibido publicar imóveis fictícios, duplicados de forma abusiva, informação enganosa ou conteúdo ilegal.</li>
-            <li>Destaques patrocinados e selos de confiança seguem condições comerciais e prazos definidos no momento da contratação.</li>
+            <li>O proprietário responde pela veracidade do anúncio.</li>
+            <li>Podem ficar em espera, em análise, activos ou recusados.</li>
+            <li>Proibidos anúncios falsos, enganadores ou ilegais.</li>
+            <li>Destaques e selos seguem o pacote contratado.</li>
         </ul>
 
-        <h2>5. Solicitações e negociação</h2>
+        <h2>7. Pedidos e negociação</h2>
         <p>
-            Toda intenção séria de negócio sobre um imóvel listado deve ser registada como <strong>solicitação</strong> na plataforma.
-            O fluxo oficial inclui estados como pendente, em contacto, proposta, fechado com sucesso, fechado sem sucesso,
-            expirado e em disputa, conforme evolução real da negociação.
+            Interesse sério num imóvel deve gerar um <strong>pedido na plataforma</strong>, com estados que reflectem
+            a realidade (pendente, em contacto, proposta, fechado com ou sem sucesso, expirado, em disputa).
         </p>
         <ul>
-            <li>As partes devem atualizar o estado de forma honesta e atempada.</li>
-            <li>Solicitações sem movimento podem receber lembretes automáticos e, após prazos operacionais, expirar com registo de conformidade.</li>
-            <li>O contacto telefónico ou presencial entre partes <strong>não dispensa</strong> a declaração do desfecho na plataforma quando o negócio decorrer da solicitação.</li>
-            <li>Fecho com sucesso pode exigir confirmação mútua de pagamento/recebimento conforme fluxo implementado; divergências originam estado de disputa.</li>
+            <li>Actualize o estado com honestidade.</li>
+            <li>Pedidos parados podem expirar após lembretes.</li>
+            <li>Telefonar ou reunir-se <strong>não substitui</strong> registar o fecho aqui, se o contacto começou na plataforma.</li>
+            <li>Desacordos sobre pagamento podem abrir estado de disputa.</li>
         </ul>
 
-        <h2>6. Janela de atribuição e integridade comercial</h2>
+        <h2>8. Comissões e prazo de 90 dias</h2>
         <p>
-            Negócios fechados entre as mesmas partes e o mesmo imóvel dentro da <strong>janela de atribuição</strong>
-            (periodo definido na política operacional, tipicamente 90 dias após a solicitação) são considerados derivados
-            da intermediação da plataforma e podem gerar comissão devida, incluindo quota de afiliado quando aplicável.
-        </p>
-        <p>
-            Tentar concluir negócios fora do sistema para evitar comissões constitui violação grave destes termos e pode
-            resultar em suspensão, cobrança de valores em dívida e registo para auditoria.
+            Negócio fechado entre as mesmas partes e o mesmo imóvel dentro do prazo de atribuição (em regra,
+            <strong>90 dias</strong> após o pedido) pode gerar comissão, incluindo parte do afiliado se houver.
+            Fechar fora da plataforma só para evitar comissão viola estes termos e pode levar a suspensão e cobrança em dívida.
         </p>
 
-        <h2>7. Afiliados</h2>
+        <h2>9. Afiliados</h2>
         <ul>
-            <li>Afiliação a um imóvel está sujeita a aprovação do proprietário ou regras automáticas configuradas no anúncio.</li>
-            <li>O afiliado não é funcionário da Pague Fácil; atua como parceiro comercial independente.</li>
-            <li>Comissões de afiliado nascem nos termos da política vigente e ligam-se ao identificador da solicitação quando aplicável.</li>
-            <li>Manipulação de referências, auto-afiliação abusiva ou fraude anula direito a comissão e pode levar a sanção de conta.</li>
+            <li>Exige autorização do proprietário ou regra do anúncio.</li>
+            <li>Parceiro independente, não empregado da Pague Fácil.</li>
+            <li>Comissão conforme política publicada.</li>
+            <li>Fraude anula direitos e pode implicar responsabilidade legal.</li>
         </ul>
 
-        <h2>8. Comissões e pagamentos</h2>
+        <h2>10. Pagamentos</h2>
         <ul>
-            <li>Comissões da plataforma são devidas quando há fecho com sucesso confirmado segundo as regras do sistema.</li>
-            <li>O pagamento entre comprador/inquilino e proprietário pode ocorrer fora da plataforma, mas o <strong>registo do fecho</strong> e o pagamento da comissão à Pague Fácil permanecem obrigatórios.</li>
-            <li>Instruções de pagamento manual (transferência, referência, comprovativo) devem ser seguidas nos prazos indicados.</li>
-            <li>Comissões em atraso podem bloquear novas publicações ou solicitações até regularização, conforme configuração operacional.</li>
-            <li>Cancelamento ou ajuste de comissão só por perfis autorizados, com motivo registado em auditoria.</li>
+            <li>Comissão devida após fecho confirmado.</li>
+            <li>Dinheiro entre particulares pode mudar de mãos fora do site, mas o <strong>registo do fecho</strong> e o pagamento à Pague Fácil são obrigatórios.</li>
+            <li>Cumpra prazos e instruções de pagamento.</li>
+            <li>Atrasos podem limitar novas acções na conta.</li>
         </ul>
 
-        <h2>9. Conteúdo e propriedade intelectual</h2>
+        <h2>11. Conteúdos e marca</h2>
         <p>
-            Ao carregar imagens, textos ou vídeos, garante que detém direitos para uso e concede à plataforma licença
-            não exclusiva para exibir e promover o material no âmbito do serviço. A marca Imobil Fácil, logótipos e software
-            são propriedade da operadora ou licenciantes; não pode copiar ou reutilizar sem autorização.
+            Ao publicar fotos ou textos, confirma que tem direito a usá-los e autoriza a exibição na plataforma.
+            Não copie a marca Imobil Fácil nem o software sem permissão.
         </p>
 
-        <h2>10. Conduta proibida</h2>
+        <h2>12. Conduta proibida</h2>
         <ul>
-            <li>Violar leis angolanas ou direitos de terceiros;</li>
-            <li>Assédio, discriminação, spam ou conteúdo ofensivo;</li>
-            <li>Tentativas de intrusão, scraping abusivo ou uso automatizado não autorizado da API;</li>
-            <li>Contornar limites de conta, CSRF, rate limiting ou controlos de comissão;</li>
-            <li>Publicar malware, phishing ou links maliciosos.</li>
+            <li>Violar a lei ou direitos de terceiros;</li>
+            <li>Assédio, discriminação, spam;</li>
+            <li>Ataques ao sistema ou automação não autorizada;</li>
+            <li>Burlar regras de segurança ou comissões;</li>
+            <li>Phishing ou conteúdo malicioso.</li>
         </ul>
 
-        <h2>11. Disponibilidade e limitação de responsabilidade</h2>
+        <h2>13. Responsabilidade</h2>
         <p>
-            O serviço é prestado com esforços razoáveis de disponibilidade e segurança, mas pode sofrer interrupções
-            por manutenção ou força maior. A operadora não garante que qualquer negócio será concluído nem responde
-            por incumprimentos entre proprietário e interessado, salvo disposição legal imperativa em contrário.
-            Na máxima medida permitida por lei, a responsabilidade económica da operadora limita-se ao montante
-            de comissões pagas pelo utilizador nos últimos doze meses relativamente ao evento que originou o pedido.
+            Prestamos o serviço com diligência, mas podem ocorrer interrupções. Não garantimos que todo o negócio se concretiza.
+            Litígios entre comprador e vendedor são, em primeira linha, entre essas partes, nos limites que a lei permitir à operadora.
         </p>
 
-        <h2>12. Resolução de disputas</h2>
+        <h2>14. Conflitos</h2>
         <p>
-            Disputas sobre pagamento declarado, fecho de negócio ou comissão devem ser tratadas primeiro nos fluxos
-            internos da plataforma (estado <em>em disputa</em>, moderação e equipa financeira). Persistindo o conflito,
-            as partes podem recorrer aos tribunais competentes em Angola, salvo acordo escrito diferente.
+            Use primeiro as ferramentas da plataforma (disputa, suporte, equipa financeira).
+            Pode recorrer aos meios de defesa do consumidor e, se necessário, aos tribunais competentes em Angola.
         </p>
 
-        <h2>13. Alterações</h2>
+        <h2>15. Dados pessoais</h2>
         <p>
-            Podemos alterar estes termos, tarifas ou fluxos operacionais com aviso prévio razoável quando a mudança
-            for material. O uso continuado após a entrada em vigor constitui aceitação, salvo direito de encerrar a conta
-            antes da nova versão produzir efeitos sobre si.
+            Ver <a href="<?php echo DIRPAGE; ?>privacidade">Política de Privacidade</a>.
+            Ao criar conta, autoriza o tratamento necessário ao serviço; outros tratamentos dependem de consentimento ou de outra base legal indicada nessa política.
         </p>
 
-        <h2>14. Contacto</h2>
+        <h2>16. Alterações</h2>
         <p>
-            Questões sobre estes termos devem ser dirigidas à equipa de suporte da Imobil Fácil através dos canais
-            oficiais no painel ou endereço de e-mail institucional da Pague Fácil indicado nas comunicações da plataforma.
+            Podemos alterar termos ou preços com aviso quando a mudança for importante.
+            O uso após a data anunciada implica aceitação; pode encerrar a conta antes.
         </p>
 
-        <h2>15. Documentos relacionados</h2>
+        <h2>17. Contacto</h2>
+        <p>
+            Suporte no painel ou contactos oficiais da Pague Fácil.
+            Reclamações sobre dados: Agência de Protecção de Dados (APD).
+        </p>
+
+        <h2>18. Leia também</h2>
         <ul>
             <li><a href="<?php echo DIRPAGE; ?>privacidade">Política de Privacidade</a></li>
             <li><a href="<?php echo DIRPAGE; ?>cookies">Política de Cookies</a></li>
         </ul>
+
+        <?php include DIRREQ . 'app/view/partials/legal_references_block.php'; ?>
     </article>
 </div>

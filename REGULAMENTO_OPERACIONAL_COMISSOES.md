@@ -26,27 +26,49 @@ Aplica-se a toda solicitacao criada no sistema e associada a um imovel publicado
 - Evasao de comissao: fecho realizado sem declaracao no sistema para evitar pagamento devido.
 
 ## 5. Fluxo obrigatorio de solicitacoes
-Estados oficiais:
-1. pendente
-2. em_contacto
-3. proposta
-4. fechado_ganho
-5. fechado_perdido
-6. expirado
-7. em_disputa
 
-Regras:
-1. Toda solicitacao inicia em pendente.
-2. Ao primeiro contato efetivo entre as partes, deve migrar para em_contacto.
-3. Quando houver proposta concreta, migrar para proposta.
-4. Todo desfecho obrigatoriamente termina em fechado_ganho, fechado_perdido ou expirado.
-5. Divergencia entre partes gera estado em_disputa.
+### 5.1 Estado comercial (`status`)
+Estados activos no sistema (`app/model/Request.php`):
+1. `em_contacto` — negociacao em curso (estado inicial na criacao)
+2. `fechado_ganho` — acordo comercial declarado pelo proprietario
+3. `cancelado` — negociacao encerrada sem acordo
+4. `expirado` — encerramento automatico por inactividade
+5. `em_disputa` — divergencia em analise pela moderacao
+
+Estados legados (`pendente`, `proposta`, `analise`) existem apenas em etiquetas de compatibilidade; nao sao valores activos do ENUM.
+
+### 5.2 Trilhas auxiliares
+Alem do `status`, cada solicitacao regista:
+- `closing_confirmation_status`: `pendente` | `confirmado` | `contestada`
+- `payment_confirmation_status`: `pendente` | `declarado_comprador` | `confirmado_proprietario` | `contestado`
+- `dispute_status`: `nenhuma` | `aberta` | `em_analise` | `julgada_procedente` | `julgada_improcedente`
+- `commercial_status` — ultimo desfecho comercial consolidado (espelho para auditoria)
+- `attribution_expires_at` — fim da janela de atribuicao (90 dias apos criacao)
+- `dispute_open_until` — prazo para abrir disputa apos fecho (30 dias)
+
+### 5.3 Transicoes permitidas
+| De | Para | Actor |
+|----|------|-------|
+| `em_contacto` | `fechado_ganho` | proprietario |
+| `em_contacto` | `cancelado` | proprietario ou interessado |
+| `fechado_ganho` | `em_disputa` | qualquer parte (contestacao de pagamento) |
+| `em_disputa` | `fechado_ganho` ou `cancelado` | moderacao |
+| `em_contacto` (inactivo) | `expirado` | scheduler automatico |
+
+`cancelado` e `expirado` sao terminais no ciclo comercial; disputa pode ser aberta dentro da janela de 30 dias quando elegivel.
+
+### 5.4 Regras de negocio
+1. Toda solicitacao inicia em `em_contacto` com `next_followup_at` a 7 dias.
+2. Desfechos comerciais validos: `fechado_ganho`, `cancelado` ou `expirado`.
+3. `fechado_ganho` abre ciclo de confirmacao de fecho e pagamento (`closing_confirmation_status = pendente`, `payment_confirmation_status = pendente`).
+4. Divergencia sobre pagamento ou recebimento encaminha para `em_disputa`.
 
 ## 6. SLA de acompanhamento
-1. Solicitacoes sem atualizacao por 7 dias recebem lembrete automatico.
-2. Solicitacoes sem desfecho por 14 dias ficam com prioridade urgente para acompanhamento.
-3. Solicitacoes sem desfecho por 30 dias migram para expirado com flag de compliance comercial.
-4. Proprietario com recorrencia de expirados entra em monitorizacao ativa.
+Implementado em `scripts/requests_sla_scheduler.php` e `Request::AUTO_EXPIRE_DAYS` (30):
+1. Solicitacoes em `em_contacto` com `next_followup_at` vencido recebem lembrete (`request_sla_reminder`) e o prazo e renovado (+7 dias).
+2. Solicitacoes em `em_contacto` sem `last_interaction_at` ha 30 dias migram para `expirado`.
+3. A prioridade urgente manual aos 14 dias e recomendacao operacional para suporte; nao ha escalonamento automatico no codigo.
+4. Proprietario com recorrencia de expirados entra em monitorizacao ativa (processo manual de compliance).
 
 ## 7. Janela de atribuicao comercial
 1. Janela padrao: 90 dias apos criacao da solicitacao.
@@ -54,17 +76,20 @@ Regras:
 3. Se houver afiliado no request_id original, sua comissao permanece devida na janela de atribuicao.
 4. Excecoes so podem ocorrer com decisao formal de compliance e registro em log.
 
-## 8. Dupla confirmacao de fecho
-1. Quando o proprietario marca fechado_ganho, o interessado recebe pedido para declarar pagamento.
-2. Se o interessado declarar pagamento, o proprietario recebe pedido para confirmar recebimento.
-3. O fecho financeiro so e consolidado quando o proprietario confirmar recebimento.
-4. Se qualquer parte contestar declaracao de pagamento ou recebimento, o caso muda para em_disputa.
-5. Se nao houver resposta dentro do SLA operacional, o caso vai para revisao manual.
+## 8. Dupla confirmacao de fecho e visita da plataforma
+1. Quando o proprietario marca `fechado_ganho` a partir de `em_contacto`, o sistema publica mensagem de sistema no chat e notifica ambas as partes (`request_closing_won_platform_visit`): a plataforma agenda visita ao imovel e avaliacao final atraves dos dados cadastrados.
+2. O interessado so deve declarar pagamento apos visitar o imovel e confirmar conformidade com o acordado.
+3. Quando o interessado declara pagamento (`payment_confirmation_status = declarado_comprador`), o proprietario recebe pedido para confirmar recebimento.
+4. O fecho financeiro e a comissao so se consolidam quando o proprietario confirma recebimento (`confirmado_proprietario`).
+5. Se qualquer parte contestar declaracao de pagamento ou recebimento, o caso passa a `em_disputa` com `payment_confirmation_status = contestado`.
+6. Resolucao de disputa a favor de `fechado_ganho` pode consolidar o fecho financeiro via moderacao (`Request::consolidateFinancialClosingByModerator`).
+7. Casos sem resposta dentro do SLA operacional seguem para revisao manual.
 
 ## 9. Mensagens internas e contato externo
-1. O sistema deve priorizar mensagens internas como canal oficial de trilho.
-2. Dados de contato pessoal podem ser exibidos, mas nao substituem obrigacao de declaracao de desfecho.
-3. Eventos criticos (proposta, fechado_ganho, fecho, cancelamento) devem ter registro interno obrigatorio.
+1. O sistema prioriza mensagens internas como canal oficial de trilho.
+2. Na primeira abertura do chat de negociacao, e exibida politica de contacto: e proibido partilhar telefone, e-mail ou redes sociais no chat.
+3. Dados de contacto pessoal fora do chat nao substituem a obrigacao de declarar desfecho na plataforma.
+4. Eventos criticos (`fechado_ganho`, declaracao de pagamento, confirmacao de recebimento, `cancelado`, disputa) geram mensagem de sistema e/ou notificacao.
 
 ## 10. Regras de comissao
 1. A comissao nasce no sistema apenas quando houver fechado_ganho e confirmacao de recebimento pelo proprietario.
@@ -122,10 +147,12 @@ Acoes automaticas:
 3. escalar para moderacao/compliance quando limiar for atingido
 
 ## 15. Governanca de disputa
-1. Evidencias aceites: mensagens internas, proposta, contrato, comprovativo de sinal, declaracoes das partes.
-2. Prazo de analise: ate 7 dias uteis.
-3. Decisao final: moderacao + financeiro, com registro obrigatorio.
-4. Decisao deve indicar: fundamento, impacto financeiro e medidas aplicadas.
+1. Janela para abrir disputa: 30 dias apos `fechado_ganho` ou `cancelado` (`DISPUTE_WINDOW_DAYS`), desde que `dispute_status = nenhuma`.
+2. Sub-estados de disputa: `aberta` → `em_analise` → `julgada_procedente` ou `julgada_improcedente`.
+3. Evidencias aceites: mensagens internas, contrato, comprovativo de sinal, declaracoes das partes.
+4. Prazo de analise: ate 7 dias uteis (meta operacional).
+5. Decisao final: moderacao (+ financeiro quando aplicavel), com registro obrigatorio.
+6. Decisao deve indicar: fundamento, impacto financeiro e medidas aplicadas.
 
 ## 16. Clausulas contratuais minimas (Termos de Uso)
 Texto base recomendado:
@@ -136,19 +163,24 @@ Texto base recomendado:
 
 ## 17. RACI operacional
 1. Proprietario
-- Atualizar estado da solicitacao e declarar desfecho.
+- Marcar `fechado_ganho` ou `cancelado` em `em_contacto`.
+- Confirmar recebimento de pagamento apos declaracao do interessado.
+- Contestar pagamento quando aplicavel.
 
 2. Interessado
-- Confirmar desfecho quando solicitado.
+- Cancelar negociacao em `em_contacto`.
+- Declarar pagamento apos visita ao imovel (quando `fechado_ganho`).
+- Contestar fecho ou pagamento.
 
 3. Moderacao
-- Revisar disputas e aplicar medidas operacionais.
+- Resolver `em_disputa` para `fechado_ganho` ou `cancelado`.
+- Consolidar fecho financeiro quando a disputa confirma acordo.
 
 4. Financeiro
-- Confirmar pagamento manual e gerir inadimplencia de comissao.
+- Confirmar pagamento manual de comissao e gerir inadimplencia.
 
 5. Suporte
-- Acompanhar SLA, lembretes e triagem inicial de conflitos.
+- Acompanhar SLA, lembretes, visitas da plataforma e triagem inicial de conflitos.
 
 ## 18. Indicadores obrigatorios (KPI)
 1. Taxa de desfecho declarado por proprietario.
@@ -158,22 +190,19 @@ Texto base recomendado:
 5. Taxa de disputa por 100 solicitacoes.
 6. Taxa de perda de comissao por evasao suspeita.
 
-## 19. Plano de implementacao em 30 dias
-Semana 1:
-1. publicar termos atualizados
-2. ativar estados de funil e SLA
+## 19. Estado de implementacao (referencia tecnica)
+Funcionalidades activas no codigo:
+1. Estados comerciais e trilhas de fecho/pagamento/disputa (`Request.php`).
+2. SLA automatico: lembretes a 7 dias e expiracao a 30 dias (`requests_sla_scheduler.php`).
+3. Dupla confirmacao de pagamento com comissao apenas apos `confirmado_proprietario`.
+4. Chat com politica de contacto e mensagem de visita da plataforma no fecho ganho.
+5. Notificacoes operacionais documentadas em `NOTIFICACOES_OPERACIONAIS.md`.
+6. Detalhe tecnico do fluxo de pagamento em `REQUESTS_FECHO_PAGAMENTO_ROADMAP.md`.
 
-Semana 2:
-1. ativar dupla confirmacao de fecho
-2. emitir obrigacao financeira manual com vencimento
-
-Semana 3:
-1. ativar bloqueios por comissao vencida
-2. ativar score de risco e fila de revisao
-
-Semana 4:
-1. calibrar penalidades e incentivos
-2. validar KPI e ajustar thresholds
+Pendente de evolucao operacional (fora do nucleo de estados):
+1. Bloqueios automaticos por comissao vencida.
+2. Score de risco e fila de revisao automatizada.
+3. Escalonamento automatico de prioridade aos 14 dias.
 
 ## 20. Checklist de execucao diaria (operacao)
 1. Verificar fila de solicitacoes urgentes/atrasadas.
@@ -185,6 +214,6 @@ Semana 4:
 
 ---
 
-Versao: 1.0
-Data: 2026-04-16
-Status: pronto para adocao operacional
+Versao: 1.1
+Data: 2026-06-08
+Status: alinhado com modelo de estados em producao (`Request.php`)

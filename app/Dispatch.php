@@ -2,6 +2,8 @@
 namespace App;
 
 use App\controller\Controller404;
+use Src\classes\ClassAuth;
+use Src\classes\ClassCsrf;
 use Src\classes\ClassRoutes;
 use Src\classes\ClassRateLimiter;
 use Src\classes\ClassCommissionGuard;
@@ -85,14 +87,19 @@ class Dispatch extends ClassRoutes {
 		}
 
 		if (isset($url[1])) {
-			$this->addMethod($url);
+			$this->addMethod($url, $RotaController);
 			return;
 		}
 
+		$this->enforceLegacyAuthenticatedCsrf($url, $RotaController);
 		ClassRateLimiter::enforceGlobalPost();
 		$defaultMethod = (string) ($url[0] ?? '');
 		if ($defaultMethod === 'robots.txt' && method_exists($this->Obj, 'robots')) {
 			$this->Obj->robots();
+			return;
+		}
+		if ($defaultMethod === '' && method_exists($this->Obj, 'index')) {
+			$this->Obj->index();
 			return;
 		}
 		if ($defaultMethod !== '' && method_exists($this->Obj, $defaultMethod)) {
@@ -109,7 +116,9 @@ class Dispatch extends ClassRoutes {
 		}
 	}
 
-	private function addMethod(array $url): void {
+	private function addMethod(array $url, string $controllerShortName): void {
+		$this->enforceLegacyAuthenticatedCsrf($url, $controllerShortName);
+
 		$methodName = (string) ($url[1] ?? '');
 		$resolvedMethod = $methodName;
 
@@ -150,6 +159,29 @@ class Dispatch extends ClassRoutes {
 		ClassCommissionGuard::enforce($controller, $url);
 		ClassLimitedAccountGuard::enforce($controller, $url);
 		ClassTrustBadgeGuard::enforce($controller, $url);
+	}
+
+	private function enforceLegacyAuthenticatedCsrf(array $url, string $controllerShortName): void {
+		if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) !== 'POST') {
+			return;
+		}
+		if ($controllerShortName === 'ControllerApi' || str_starts_with($controllerShortName, 'ControllerApi')) {
+			return;
+		}
+		if (!ClassAuth::check()) {
+			return;
+		}
+
+		$parts = [];
+		foreach ($url as $segment) {
+			$segment = trim((string) $segment);
+			if ($segment !== '') {
+				$parts[] = $segment;
+			}
+		}
+		$fallback = implode('/', $parts);
+
+		ClassCsrf::enforcePostToken($fallback !== '' ? $fallback : 'dashboard');
 	}
 
 	private function renderNotFound(): void {

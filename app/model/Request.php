@@ -18,7 +18,7 @@ class Request extends ManipularBanco
 
     public const DISPUTE_ELIGIBLE_STATUSES = ['fechado_ganho', 'cancelado'];
 
-    public const AUTO_EXPIRE_DAYS = 15;
+    public const AUTO_EXPIRE_DAYS = 30;
 
     public const DISPUTE_WINDOW_DAYS = 30;
 
@@ -820,21 +820,84 @@ class Request extends ManipularBanco
             $data['dispute_status'] = self::DISPUTE_STATUS_NONE;
         }
 
-        $ok = $db->Salvar($data, $db->table);
-        if ($ok) {
-            $requestId = (int) $db->ConexaoDB()->lastInsertId();
-            MetricEvent::track('request_created', [
-                'entity_type' => 'request',
-                'entity_id' => $requestId,
-                'user_id' => $data['user_id'] ?? null,
-                'metadata' => [
-                    'property_id' => $data['property_id'] ?? null,
-                    'status' => $data['status'],
-                ],
-            ]);
+        $insertResult = $db->Salvar($data, $db->table);
+        if (!$insertResult) {
+            return false;
         }
 
-        return $ok;
+        $requestId = is_int($insertResult)
+            ? $insertResult
+            : (int) $db->ConexaoDB()->lastInsertId();
+        if ($requestId <= 0) {
+            return false;
+        }
+
+        MetricEvent::track('request_created', [
+            'entity_type' => 'request',
+            'entity_id' => $requestId,
+            'user_id' => $data['user_id'] ?? null,
+            'metadata' => [
+                'property_id' => $data['property_id'] ?? null,
+                'status' => $data['status'],
+            ],
+        ]);
+
+        return $requestId;
+    }
+
+    public static function touchLastInteraction(int $requestId): bool
+    {
+        if ($requestId <= 0) {
+            return false;
+        }
+
+        $db = new self();
+        $sql = "UPDATE {$db->table}
+                SET last_interaction_at = NOW(),
+                    updated_at = NOW()
+                WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        if (!$stmt->execute([$requestId])) {
+            return false;
+        }
+
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * Consolida fecho financeiro após julgamento de disputa a favor do fecho ganho.
+     */
+    public static function consolidateFinancialClosingByModerator(int $requestId, int $actorId): bool
+    {
+        if ($requestId <= 0 || $actorId <= 0) {
+            return false;
+        }
+
+        $db = new self();
+        $sql = "UPDATE {$db->table}
+                SET commercial_status = 'fechado_ganho',
+                    payment_confirmation_status = ?,
+                    payment_received_confirmed_by = COALESCE(payment_received_confirmed_by, ?),
+                    payment_received_confirmed_at = COALESCE(payment_received_confirmed_at, NOW()),
+                    closing_confirmation_status = ?,
+                    closing_confirmed_by = COALESCE(closing_confirmed_by, ?),
+                    closing_confirmed_at = COALESCE(closing_confirmed_at, NOW()),
+                    last_interaction_at = NOW(),
+                    updated_at = NOW()
+                WHERE id = ?
+                  AND status = 'fechado_ganho'";
+        $stmt = $db->prepare($sql);
+        if (!$stmt->execute([
+            self::PAYMENT_CONFIRMATION_CONFIRMED_BY_OWNER,
+            $actorId,
+            self::CLOSING_CONFIRMATION_CONFIRMED,
+            $actorId,
+            $requestId,
+        ])) {
+            return false;
+        }
+
+        return $stmt->rowCount() > 0;
     }
 
     public static function declareClosingWon(int $requestId, int $actorId): bool

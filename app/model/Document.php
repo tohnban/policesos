@@ -129,6 +129,26 @@ class Document extends ManipularBanco
         return $result ?: null;
     }
 
+    public static function findByFilename(string $filename): ?array
+    {
+        if (!self::hasDocumentsTable()) {
+            return null;
+        }
+
+        $filename = basename(str_replace('\\', '/', trim($filename)));
+        if ($filename === '') {
+            return null;
+        }
+
+        $db = new self();
+        $sql = 'SELECT * FROM documents WHERE filename = ? ORDER BY id DESC LIMIT 1';
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$filename]);
+
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
     /**
      * Get latest document for a property
      *

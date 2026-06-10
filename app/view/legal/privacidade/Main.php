@@ -1,155 +1,145 @@
 <?php
-$legalKicker = 'Base legal';
+$legalKicker = 'Informação útil';
 $legalTitle = 'Política de Privacidade';
-$legalLead = 'Como a Imobil Fácil recolhe, utiliza e protege os seus dados pessoais no contexto da negociação imobiliária em Angola.';
+$legalLead = 'Que dados recolhemos na Imobil Fácil, porque precisamos deles, com quem os partilhamos e quais são os seus direitos.';
+
+ob_start();
+?>
+<h4>Diplomas de referência</h4>
+<ul>
+    <li>Constituição da República de Angola — artigo 32.º, n.º 2.</li>
+    <li>Lei n.º 22/11, de 17 de Junho — LPDP (regime geral de tratamento de dados pessoais).</li>
+    <li>Lei n.º 23/11, de 20 de Junho — LCE (dados e privacidade em serviços da sociedade da informação).</li>
+    <li>Lei n.º 15/03, de 22 de Julho — Lei de Defesa do Consumidor (quando aplicável à relação de consumo).</li>
+    <li>Lei n.º 1/07, de 14 de Maio — Lei das Actividades Comerciais (comércio electrónico).</li>
+</ul>
+<h4>LPDP — artigos relevantes para esta política</h4>
+<ul>
+    <li><strong>Artigos 11.º e 12.º</strong> — princípios e bases do tratamento (consentimento, contrato, obrigação legal, interesse legítimo).</li>
+    <li><strong>Artigo 25.º</strong> — direito de informação do titular.</li>
+    <li><strong>Artigos 26.º a 28.º</strong> — acesso, oposição, rectificação, actualização e eliminação.</li>
+    <li><strong>Artigo 29.º</strong> — decisões automatizadas (ex.: ordenação de imóveis com base em interacções).</li>
+    <li><strong>Artigos 21.º a 23.º</strong> — comunicação de dados e subcontratados.</li>
+    <li><strong>Artigos 30.º e 31.º</strong> — segurança do tratamento.</li>
+    <li><strong>Artigos 33.º e 34.º</strong> — transferência internacional de dados.</li>
+    <li><strong>Artigos 35.º a 38.º</strong> — notificação e publicidade de tratamentos perante a APD, quando exigido.</li>
+    <li><strong>Artigos 42.º e 43.º</strong> — sector privado e cooperativo.</li>
+    <li><strong>Artigo 55.º</strong> — regime sancionatório por incumprimento.</li>
+</ul>
+<h4>Autoridade de supervisão</h4>
+<p>Agência de Protecção de Dados (APD).</p>
+<?php
+$legalReferencesContent = ob_get_clean();
 ?>
 <div class="container legal-page">
     <?php include DIRREQ . 'app/view/partials/legal_page_hero.php'; ?>
 
-    <article class="dashboard-module-card legal-document" style="padding:1.5rem 2rem; margin-bottom:2rem;">
-        <p class="legal-meta">Última atualização: junho de 2026 · Responsável: <strong>Pague Fácil, Comércio e Serviços, LDA</strong> (operador da plataforma <strong>Imobil Fácil</strong>)</p>
+    <article class="dashboard-module-card legal-document">
+        <?php include DIRREQ . 'app/view/partials/legal_angola_intro.php'; ?>
 
-        <h2>1. Âmbito</h2>
+        <p class="legal-meta">Última actualização: junho de 2026 · <strong>Responsável pelo tratamento:</strong> Pague Fácil, Comércio e Serviços, LDA</p>
+
+        <h2>Quem somos</h2>
         <p>
-            Esta política aplica-se a visitantes e utilizadores registados da Imobil Fácil — plataforma digital
-            para publicação, descoberta e negociação de imóveis em Angola, com gestão de solicitações,
-            afiliação, comissões e comunicação entre partes.
+            A Imobil Fácil é uma plataforma angolana para encontrar, anunciar e negociar imóveis.
+            Tratamos os seus dados pessoais com transparência e em respeito pela sua privacidade.
         </p>
 
-        <h2>2. Responsável pelo tratamento</h2>
+        <h2>A quem se aplica</h2>
         <p>
-            O tratamento de dados pessoais é realizado pela <strong>Pague Fácil, Comércio e Serviços, LDA</strong>,
-            enquanto entidade que explora a plataforma Imobil Fácil. Para exercício de direitos ou questões de privacidade,
-            utilize os canais de suporte disponíveis na área autenticada ou o endereço de contacto indicado nas comunicações oficiais da plataforma.
+            Visitantes do site e utilizadores com conta: proprietários, compradores, inquilinos, afiliados
+            e outras pessoas envolvidas nos processos da plataforma.
         </p>
 
-        <h2>3. Categorias de dados tratados</h2>
-        <p>Consoante a sua utilização do serviço, podemos tratar:</p>
+        <h2>Que dados podemos recolher</h2>
         <ul>
-            <li><strong>Identificação e conta:</strong> nome, e-mail, telefone, nome de utilizador, palavra-passe (armazenada de forma segura), tipo de perfil (particular ou empresa), documentos de verificação quando exigidos.</li>
-            <li><strong>Imóveis e negócio:</strong> título, descrição, localização, preço, imagens, vídeos, estado do anúncio, dados de proprietário/afiliado associados ao imóvel.</li>
-            <li><strong>Solicitações e mensagens:</strong> intenção de compra ou aluguer, histórico de estados, chat interno associado ao pedido, comprovativos de pagamento quando aplicável.</li>
-            <li><strong>Financeiro e comissões:</strong> referências de pagamento manual, transações registadas na plataforma, contas de recebimento configuradas por utilizadores autorizados.</li>
-            <li><strong>Navegação e preferências:</strong> sessão, endereço IP, identificador de visitante (<code>visitor_key</code>), eventos de interação (visualizações, favoritos, pedidos), preferência de cookies de personalização.</li>
-            <li><strong>Segurança:</strong> registos de tentativas de acesso, tokens de API quando utilizados, logs técnicos com identificador de pedido (<code>request_id</code>) para diagnóstico de incidentes.</li>
+            <li><strong>Conta:</strong> nome, e-mail, telefone, utilizador, palavra-passe (protegida), tipo de perfil, documentos de verificação.</li>
+            <li><strong>Imóveis:</strong> descrições, fotos, vídeos, preço, localização, estado do anúncio.</li>
+            <li><strong>Pedidos e mensagens:</strong> interesse num imóvel, evolução do pedido, conversas na plataforma.</li>
+            <li><strong>Pagamentos e comissões:</strong> referências, comprovativos e dados para liquidar obrigações.</li>
+            <li><strong>Navegação:</strong> páginas visitadas, preferências de cookies — ver <a href="<?php echo DIRPAGE; ?>cookies">Política de Cookies</a>.</li>
+            <li><strong>Segurança:</strong> registos de acesso e medidas anti-fraude.</li>
         </ul>
 
-        <h2>4. Finalidades e bases legais</h2>
-        <table class="legal-table">
-            <thead>
-                <tr>
-                    <th>Finalidade</th>
-                    <th>Base legal (resumo)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Criar e gerir a sua conta, autenticação e recuperação de acesso</td>
-                    <td>Execução de contrato / diligências pré-contratuais</td>
-                </tr>
-                <tr>
-                    <td>Publicar imóveis, processar solicitações e mensagens entre partes</td>
-                    <td>Execução de contrato</td>
-                </tr>
-                <tr>
-                    <td>Calcular, emitir e acompanhar comissões e obrigações financeiras da plataforma</td>
-                    <td>Execução de contrato e cumprimento de obrigações legais</td>
-                </tr>
-                <tr>
-                    <td>Moderar conteúdos, prevenir fraude e garantir integridade comercial</td>
-                    <td>Interesse legítimo e obrigações legais</td>
-                </tr>
-                <tr>
-                    <td>Enviar notificações operacionais (estado de pedidos, comissões, conta)</td>
-                    <td>Execução de contrato / interesse legítimo</td>
-                </tr>
-                <tr>
-                    <td>Personalizar a ordem de imóveis apresentados (ranking comportamental)</td>
-                    <td>Consentimento (cookies de personalização) ou interesse legítimo limitado para utilizadores autenticados conforme configuração</td>
-                </tr>
-                <tr>
-                    <td>Cookies essenciais (sessão, segurança, CSRF)</td>
-                    <td>Necessidade técnica para prestação do serviço</td>
-                </tr>
-            </tbody>
-        </table>
-        <p>
-            O detalhe sobre cookies encontra-se na
-            <a href="<?php echo DIRPAGE; ?>cookies">Política de Cookies</a>.
-        </p>
-
-        <h2>5. Ranking comportamental e visitantes anónimos</h2>
-        <p>
-            A plataforma pode registar eventos como visualização de imóvel, favorito ou criação de solicitação,
-            associados ao seu <code>user_id</code> (se autenticado) e/ou a um identificador de sessão anónimo.
-            Estes sinais servem para melhorar a relevância das listagens, sem substituir critérios comerciais
-            (destaques patrocinados, disponibilidade e regras de visibilidade mantêm prioridade).
-            Visitantes sem conta só são perfilados de forma comportamental após consentimento explícito para cookies de personalização.
-        </p>
-
-        <h2>6. Partilha de dados</h2>
-        <p>Os seus dados podem ser visíveis ou partilhados nas seguintes situações:</p>
+        <h2>Porque usamos os seus dados</h2>
         <ul>
-            <li><strong>Entre utilizadores da negociação:</strong> proprietário, interessado e afiliado envolvido numa solicitação veem informação necessária ao processo (ex.: contacto após regras da plataforma, estado do pedido).</li>
-            <li><strong>Perfis públicos:</strong> páginas de agência ou promotor institucional exibem dados que o utilizador optou por tornar públicos no âmbito do plano.</li>
-            <li><strong>Prestadores técnicos:</strong> alojamento, e-mail (SMTP), processamento de imagens em fila — apenas na medida necessária e com obrigações de confidencialidade.</li>
-            <li><strong>Autoridades:</strong> quando exigido por lei ou decisão judicial válida.</li>
-        </ul>
-        <p>Não vendemos os seus dados pessoais a terceiros para marketing externo.</p>
-
-        <h2>7. Conservação</h2>
-        <p>
-            Os dados são conservados pelo tempo necessário à finalidade que motivou a recolha: vigência da conta,
-            cumprimento de obrigações comerciais e fiscais, resolução de disputas e prazos legais aplicáveis.
-            Registos de auditoria e eventos críticos de negócio podem ser mantidos por períodos superiores quando
-            necessários para defesa de direitos ou conformidade do modelo de comissões.
-        </p>
-
-        <h2>8. Segurança</h2>
-        <p>
-            Adotamos medidas técnicas e organizativas adequadas, incluindo controlo de acesso por perfil,
-            proteção CSRF em alterações de estado, limitação de tentativas de login, validação de documentos
-            e registo de operações sensíveis. Nenhum sistema é absolutamente inviolável; em caso de incidente
-            relevante, adotaremos medidas de mitigação e comunicação conforme a lei aplicável.
-        </p>
-
-        <h2>9. Os seus direitos</h2>
-        <p>Nos termos da legislação de proteção de dados aplicável em Angola, pode solicitar, entre outros:</p>
-        <ul>
-            <li>Acesso e cópia dos dados que tratamos sobre si;</li>
-            <li>Retificação de dados inexatos ou incompletos;</li>
-            <li>Eliminação ou limitação do tratamento, quando aplicável;</li>
-            <li>Oposição a tratamentos baseados em interesse legítimo, quando previsto;</li>
-            <li>Retirada do consentimento (ex.: cookies de personalização), sem afetar tratamentos já realizados licitamente.</li>
+            <li>Criar e gerir a sua conta e permitir o uso seguro do site.</li>
+            <li>Publicar imóveis, processar pedidos de interesse e mensagens entre as partes.</li>
+            <li>Calcular e comunicar comissões quando um negócio é fechado através da plataforma.</li>
+            <li>Enviar avisos importantes (estado de pedidos, pagamentos, conta).</li>
+            <li>Prevenir fraude e manter o marketplace fiável.</li>
+            <li>Personalizar listagens, se aceitar cookies de personalização ou nos termos do serviço com conta.</li>
         </ul>
         <p>
-            Pedidos devem ser enviados através dos canais oficiais de suporte, identificando a conta associada.
-            Podemos solicitar informação adicional para confirmar a sua identidade antes de responder.
+            Em cada caso baseamo-nos no seu <strong>consentimento</strong>, na <strong>execução do contrato</strong>
+            connosco, em <strong>obrigações legais</strong> ou em <strong>interesse legítimo</strong>, quando a lei o permitir
+            e os seus direitos não prevalecerem.
         </p>
 
-        <h2>10. Menores</h2>
+        <h2>Sugestões de imóveis adaptadas a si</h2>
         <p>
-            A plataforma destina-se a utilizadores com capacidade legal para contratar. Não recolhemos
-            intencionalmente dados de menores sem autorização parental adequada.
+            Podemos ordenar listagens com base no que já viu ou guardou. Isto não substitui anúncios em destaque
+            nem regras de visibilidade. Quem navega sem conta só recebe personalização após aceitar cookies no aviso do site.
+            Pode pedir esclarecimentos ao suporte sobre este tipo de tratamento.
         </p>
 
-        <h2>11. Transferências internacionais</h2>
+        <h2>Com quem partilhamos dados</h2>
+        <ul>
+            <li><strong>Outras partes no negócio</strong> — no âmbito de um pedido (contacto e estado, conforme regras da plataforma).</li>
+            <li><strong>Prestadores de apoio técnico</strong> — alojamento, e-mail, imagens, com dever de confidencialidade.</li>
+            <li><strong>Perfil público de agência</strong> — apenas o que escolheu tornar visível.</li>
+            <li><strong>Autoridades</strong> — quando a lei ou ordem judicial o exigir.</li>
+        </ul>
+        <p><strong>Não vendemos</strong> os seus dados para publicidade de terceiros.</p>
+
+        <h2>Dados fora de Angola</h2>
         <p>
-            Os dados são tratados preferencialmente em infraestrutura compatível com a operação em Angola.
-            Se algum subcontratante processar dados fora do país, garantimos salvaguardas contratuais adequadas.
+            Preferimos tratar dados em condições compatíveis com a protecção exigida em Angola.
+            Se algum prestador processar dados no estrangeiro, aplicamos garantias contratuais e legais adequadas.
         </p>
 
-        <h2>12. Alterações</h2>
+        <h2>Por quanto tempo guardamos</h2>
         <p>
-            Esta política pode ser atualizada para refletir novas funcionalidades ou requisitos legais.
-            A data de revisão no topo da página será alterada; alterações materiais podem ser comunicadas
-            na plataforma ou por e-mail aos utilizadores registados.
+            Enquanto a conta estiver activa e pelo tempo necessário a obrigações legais, comissões, litígios
+            ou defesa de direitos. Alguns registos de operações podem conservar-se mais tempo quando justificado.
         </p>
 
-        <h2>13. Documentos relacionados</h2>
+        <h2>Como protegemos a informação</h2>
+        <p>
+            Controlos de acesso, protecção das comunicações, limites de tentativas de login e registo de acções sensíveis.
+            Se ocorrer incidente grave de segurança, actuamos conforme os deveres legais, incluindo comunicação à APD quando aplicável.
+        </p>
+
+        <h2>Os seus direitos</h2>
+        <ul>
+            <li>Saber que dados temos sobre si;</li>
+            <li>Corrigir informação incorrecta;</li>
+            <li>Pedir eliminação ou limitação, quando a lei o permitir;</li>
+            <li>Opor-se a certos tratamentos;</li>
+            <li>Retirar consentimento (ex.: cookies opcionais).</li>
+        </ul>
+        <p>
+            Contacte o suporte indicando a sua conta. Podemos pedir prova de identidade.
+            Pode também reclamar junto da <strong>Agência de Protecção de Dados (APD)</strong>.
+        </p>
+
+        <h2>Menores</h2>
+        <p>
+            O serviço destina-se a adultos com capacidade para negociar. Não recolhemos intencionalmente
+            dados de menores sem autorização dos responsáveis.
+        </p>
+
+        <h2>Alterações</h2>
+        <p>
+            Podemos actualizar esta política. A data no topo será revista; mudanças importantes podem ser comunicadas no site ou por e-mail.
+        </p>
+
+        <h2>Outros documentos</h2>
         <ul>
             <li><a href="<?php echo DIRPAGE; ?>cookies">Política de Cookies</a></li>
-            <li><a href="<?php echo DIRPAGE; ?>termos">Termos e Condições de Utilização</a></li>
+            <li><a href="<?php echo DIRPAGE; ?>termos">Termos e Condições</a></li>
         </ul>
+
+        <?php include DIRREQ . 'app/view/partials/legal_references_block.php'; ?>
     </article>
 </div>

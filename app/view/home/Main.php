@@ -24,16 +24,21 @@ $partialCard = DIRREQ . 'app/view/partials/property_carousel_card.php';
 <section class="sales-hero home-hero">
     <div class="container sales-hero-shell">
         <div class="sales-hero-copy">
-            <span class="sales-kicker">Imobil Fácil — Imóveis verificados em Angola</span>
-            <h1>O seu próximo imóvel está aqui. Encontre, visite e feche negócio.</h1>
-            <p>Imóveis residenciais, comerciais, industriais, terrenos e opções de turismo com proprietários confirmados. Sem surpresas, sem intermediários desnecessários.</p>
+            <span class="sales-kicker">Imobil Fácil — imóveis verificados em Angola</span>
+            <h1 class="home-hero-title">
+                <span class="home-hero-title-line">Negocie com o proprietário</span>
+                <span class="home-hero-title-line">do início ao fim,</span>
+                <span class="home-hero-title-highlight">Sem intermediários.</span>
+            </h1>
+            <p class="home-hero-lead">Casas, apartamentos, terrenos e espaços comerciais com donos confirmados.</p>
+            <p class="home-hero-lead home-hero-lead-secondary">Contacto directo na plataforma — negocie preço e condições com quem realmente decide.</p>
             <div class="sales-hero-proof">
-                <span><i class="fa fa-check-circle"></i> Proprietários verificados</span>
-                <span><i class="fa fa-shield"></i> Pagamento seguro via Pague Fácil</span>
-                <span><i class="fa fa-bolt"></i> Resposta em menos de 24h</span>
+                <span><i class="fa fa-user-circle"></i> Negociação directa com o proprietário</span>
+                <span><i class="fa fa-check-circle"></i> Anúncios verificados antes de publicar</span>
+                <span><i class="fa fa-shield"></i> Pagamento seguro com a Pague Fácil</span>
             </div>
             <div class="sales-hero-actions">
-                <a href="<?php echo DIRPAGE; ?>properties" class="btn-primary">Ver imóveis disponíveis agora</a>
+                <a href="<?php echo DIRPAGE; ?>properties" class="btn-primary">Ver imóveis e contactar donos</a>
                 <a href="<?php echo DIRPAGE; ?>featured" class="btn-secondary">Ver os mais procurados</a>
             </div>
         </div>
@@ -55,10 +60,10 @@ $partialCard = DIRREQ . 'app/view/partials/property_carousel_card.php';
                 </div>
             </div>
             <div class="sales-hero-panel-note">
-                <strong>Imóveis saem rapidamente</strong>
-                <span>Os melhores imóveis são reservados em poucos dias. Não deixe para amanhã.</span>
+                <strong>Sem filas nem intermediários</strong>
+                <span>O seu pedido chega ao proprietário. A resposta é de quem tem o imóvel — não de um intermediário.</span>
             </div>
-            <p>Registe-se gratuitamente e receba alertas dos novos imóveis primeiro.</p>
+            <p>Crie conta gratuita e seja avisado quando entrar um imóvel que combina com o que procura.</p>
         </aside>
     </div>
 </section>
@@ -66,31 +71,31 @@ $partialCard = DIRREQ . 'app/view/partials/property_carousel_card.php';
 <section class="sales-strip">
     <div class="container sales-strip-grid">
         <article>
-            <i class="fa fa-check-circle"></i>
+            <i class="fa fa-user-circle"></i>
             <div>
-                <strong>Sabe exatamente o que está a comprar</strong>
-                <span>Todos os imóveis passam por verificação antes de aparecerem aqui.</span>
+                <strong>Sem intermediários</strong>
+                <span>Trata com o proprietário desde o primeiro contacto. Sem intermediários, sem comissões escondidas.</span>
             </div>
         </article>
         <article>
-            <i class="fa fa-user-circle"></i>
+            <i class="fa fa-comments"></i>
             <div>
-                <strong>Fala diretamente com o proprietário</strong>
-                <span>Sem intermediários. Contacto direto, negociação mais rápida.</span>
+                <strong>Negociação transparente</strong>
+                <span>Pedidos, mensagens e propostas ficam registados entre si e o dono do imóvel.</span>
+            </div>
+        </article>
+        <article>
+            <i class="fa fa-check-circle"></i>
+            <div>
+                <strong>Proprietários verificados</strong>
+                <span>Só entram anúncios de quem confirmou identidade — sabe com quem está a falar.</span>
             </div>
         </article>
         <article>
             <i class="fa fa-lock"></i>
             <div>
-                <strong>O seu dinheiro está protegido</strong>
-                <span>Pagamentos processados pela Pague Fácil, com registo e confirmação.</span>
-            </div>
-        </article>
-        <article>
-            <i class="fa fa-bell"></i>
-            <div>
-                <strong>Não perde nenhuma oportunidade</strong>
-                <span>Receba alertas quando entrar um imóvel que corresponde ao que procura.</span>
+                <strong>Pagamento com registo</strong>
+                <span>Quando há valores envolvidos, a Pague Fácil processa com confirmação e histórico.</span>
             </div>
         </article>
     </div>
@@ -123,7 +128,7 @@ $partialCard = DIRREQ . 'app/view/partials/property_carousel_card.php';
     <div class="section-header sales-section-header">
         <div>
             <h2>Imóveis em Destaque</h2>
-            <p>Selecionados com mais atenção — proprietários confirmados, fotos reais e resposta rápida garantida.</p>
+            <p>Proprietários confirmados e disponíveis para negociar directamente — sem passar por agência.</p>
         </div>
         <a href="<?php echo DIRPAGE; ?>featured" class="btn-secondary">Ver todos os destaques</a>
     </div>
@@ -141,8 +146,8 @@ $partialCard = DIRREQ . 'app/view/partials/property_carousel_card.php';
             </div>
         </div>
         <p class="sales-carousel-sub"><?php echo $discoveryPersonalized
-            ? 'Combinação dinâmica de imóveis para si — inclui patrocinados misturados, identificados com o selo Patrocinado.'
-            : 'Imóveis com proprietários verificados e alto interesse — os primeiros a ir são sempre os melhores.'; ?></p>
+            ? 'Sugestões para si — contacte o proprietário directamente. Patrocinados aparecem com selo visível.'
+            : 'Alto interesse e donos que respondem — quem contacta primeiro negocia sem intermediários.'; ?></p>
 
         <?php if (!empty($featuredProperties)): ?>
             <div class="sales-carousel-viewport" id="homeSalesViewport">
@@ -150,71 +155,11 @@ $partialCard = DIRREQ . 'app/view/partials/property_carousel_card.php';
                     <?php foreach ($featuredProperties as $idx => $property): ?>
                         <?php
                         $position = (int) $idx + 1;
-                        $isFav = in_array((int) ($property['id'] ?? 0), $favoriteIds ?? [], true);
-                        $createdAt = strtotime((string) ($property['created_at'] ?? ''));
-                        $daysDiff = $createdAt > 0 ? (int) floor((time() - $createdAt) / 86400) : 99;
-                        if ($daysDiff === 0) {
-                            $urgencyText = 'Publicado hoje';
-                        } elseif ($daysDiff === 1) {
-                            $urgencyText = 'Publicado ontem';
-                        } elseif ($daysDiff <= 7) {
-                            $urgencyText = 'Publicado há ' . $daysDiff . ' dias';
-                        } else {
-                            $urgencyTags = ['Alta procura', 'Muito procurado', 'Preço competitivo'];
-                            $urgencyText = $urgencyTags[$idx % count($urgencyTags)];
+                        $showSponsoredBadge = !empty($property['featured']);
+                        if (is_file($partialCard)) {
+                            include $partialCard;
                         }
-                        $imagesList = json_decode((string) ($property['images'] ?? '[]'), true);
-                        $firstImage = (is_array($imagesList) && !empty($imagesList[0])) ? (string) $imagesList[0] : '';
-                        if ($firstImage !== '' && !preg_match('#^https?://#i', $firstImage)) {
-                            $firstImage = DIRPAGE . ltrim($firstImage, '/');
-                        }
-                        $coverImage = $firstImage !== '' ? $firstImage : (DIRIMG . 'apt20.avif');
-                        $ownerPhoneDigits = preg_replace('/\D+/', '', (string) ($property['owner_phone'] ?? ''));
-                        if ($ownerPhoneDigits !== '' && strpos($ownerPhoneDigits, '244') !== 0) {
-                            $ownerPhoneDigits = '244' . $ownerPhoneDigits;
-                        }
-                        $waMessage = rawurlencode('Ola, vi o imovel ' . ($property['title'] ?? '') . ' em ' . DIRPAGE . ' e quero negociar.');
-                        $waLink = $ownerPhoneDigits !== '' ? ('https://wa.me/' . $ownerPhoneDigits . '?text=' . $waMessage) : '';
                         ?>
-                        <article class="sales-carousel-card">
-                            <div class="sales-carousel-img">
-                                <img src="<?php echo htmlspecialchars($coverImage); ?>" alt="<?php echo htmlspecialchars($property['title']); ?>">
-                                <?php if (Src\classes\ClassAuth::check() && !(Src\classes\ClassAuth::user()['is_admin'] ?? false)): ?>
-                                    <form method="POST" action="<?php echo DIRPAGE; ?>property/<?php echo $isFav ? 'unfavorite' : 'favorite'; ?>/<?php echo (int) $property['id']; ?>" class="favorite-form-inline favorite-overlay favorite-overlay-rank-shift">
-                                        <?php echo Src\classes\ClassCsrf::field(); ?>
-                                        <button type="submit" class="btn-favorite<?php echo $isFav ? ' is-active' : ''; ?>" title="<?php echo $isFav ? 'Remover dos favoritos' : 'Guardar nos favoritos'; ?>" aria-label="<?php echo $isFav ? 'Remover dos favoritos' : 'Guardar nos favoritos'; ?>">
-                                            <i class="fa <?php echo $isFav ? 'fa-heart' : 'fa-heart-o'; ?>"></i>
-                                        </button>
-                                    </form>
-                                <?php endif; ?>
-                                <?php if (!empty($property['featured'])): ?>
-                                <span class="sales-card-badge"><i class="fa fa-bullhorn"></i> Patrocinado</span>
-                                <?php endif; ?>
-                                <?php if ($position <= 3): ?>
-                                    <span class="sales-rank-badge">TOP <?php echo $position; ?></span>
-                                <?php endif; ?>
-                            </div>
-                            <div class="sales-carousel-card-body">
-                                <div class="sales-carousel-tags">
-                                    <span class="sales-urgency-tag"><i class="fa <?php echo $daysDiff <= 1 ? 'fa-clock-o' : ($daysDiff <= 7 ? 'fa-calendar' : 'fa-fire'); ?>"></i> <?php echo $urgencyText; ?></span>
-                                </div>
-                                <h3><a href="<?php echo DIRPAGE; ?>property/<?php echo (int) $property['id']; ?>" class="card-title-link"><?php echo htmlspecialchars($property['title']); ?></a></h3>
-                                <p class="sales-location"><i class="fa fa-map-marker"></i> <?php echo htmlspecialchars($property['location']); ?></p>
-                                <p class="sales-price"><?php echo number_format((float) $property['price'], 0, ',', '.'); ?> Kz</p>
-                                <div class="sales-meta-row">
-                                    <span><i class="fa fa-bed"></i> <?php echo (int) $property['bedrooms']; ?> quartos</span>
-                                    <span><i class="fa fa-bath"></i> <?php echo (int) $property['bathrooms']; ?> banhos</span>
-                                </div>
-                                <div class="sales-carousel-actions">
-                                    <a href="<?php echo DIRPAGE; ?>property/<?php echo (int) $property['id']; ?>" class="btn-primary sales-card-cta">Ver este imóvel</a>
-                                    <?php if ($waLink !== ''): ?>
-                                        <a href="<?php echo htmlspecialchars($waLink); ?>" target="_blank" rel="noopener noreferrer" class="btn-secondary sales-card-cta sales-wa-cta">
-                                            <i class="fa fa-whatsapp"></i> Contactar agora
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </article>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -223,8 +168,8 @@ $partialCard = DIRREQ . 'app/view/partials/property_carousel_card.php';
             <div class="sales-empty-state">
                 <i class="fa fa-home"></i>
                 <h3>Ainda sem destaques</h3>
-                <p>Novos imóveis entram todos os dias. Veja a listagem completa e encontre o seu.</p>
-                <a href="<?php echo DIRPAGE; ?>properties" class="btn-primary">Ver imóveis disponíveis agora</a>
+                <p>Novos anúncios entram todos os dias. Explore a listagem e fale directamente com os proprietários.</p>
+                <a href="<?php echo DIRPAGE; ?>properties" class="btn-primary">Ver imóveis sem intermediários</a>
             </div>
         <?php endif; ?>
     </section>

@@ -30,7 +30,10 @@ final class RouteMiddlewareRunner
                 return;
             }
             if (!ClassCsrf::validate($_POST['csrf_token'] ?? '')) {
-                ClassCsrf::failRedirect($route->routeKey !== '' ? $route->routeKey : 'dashboard');
+                $fallback = $route->path !== ''
+                    ? $route->path
+                    : ($route->routeKey !== '' ? $route->routeKey : 'dashboard');
+                ClassCsrf::rejectPost($fallback);
             }
             return;
         }

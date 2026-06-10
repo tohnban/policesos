@@ -552,6 +552,7 @@ CREATE TABLE request_chat_reads (
     thread_id INT NOT NULL,
     user_id INT NOT NULL,
     last_read_at TIMESTAMP NULL DEFAULT NULL,
+    last_read_message_id INT UNSIGNED NULL DEFAULT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY unique_request_chat_read_user (thread_id, user_id),
@@ -826,21 +827,12 @@ INSERT INTO subscription_plans (
     ('enterprise', 'Plano Empresarial', 100000.00, NULL, 100, 'premium', TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
 INSERT INTO payment_methods (code, name, direction, audience, requires_reference, fields_config, is_active) VALUES
-    ('bank_transfer', 'Transferencia Bancaria', 'both', 'both', TRUE,
-     '{"account_name":true,"account_number":true,"iban":true,"bank_name":true,"wallet_provider":false,"phone_number":false}', TRUE),
-    ('multicaixa_express', 'Multicaixa Express', 'both', 'both', TRUE,
-     '{"account_name":true,"account_number":false,"iban":false,"bank_name":false,"wallet_provider":true,"phone_number":true}', TRUE),
-    ('mobile_wallet', 'Carteira Movel', 'both', 'both', TRUE,
-     '{"account_name":true,"account_number":false,"iban":false,"bank_name":false,"wallet_provider":true,"phone_number":true}', TRUE),
-    ('cash', 'Numerario', 'incoming', 'system', FALSE,
-     '{"account_name":false,"account_number":false,"iban":false,"bank_name":false,"wallet_provider":false,"phone_number":false}', TRUE);
+    ('bank_transfer', 'Depósito/Transferência Bancária', 'both', 'both', TRUE,
+     '{"account_name":true,"account_number":true,"iban":true,"bank_name":true,"wallet_provider":false,"phone_number":false}', TRUE);
 
 INSERT INTO system_payment_channels (method_id, channel_name, account_name, account_number, iban, bank_name, is_default, is_active)
 SELECT pm.id, 'Conta principal BAI', 'Imobil Facil Lda', '1234567890123', 'AO06004000001234567890123', 'BAI', TRUE, TRUE
-FROM payment_methods pm WHERE pm.code = 'bank_transfer'
-UNION ALL
-SELECT pm.id, 'Multicaixa Express Plataforma', 'Imobil Facil', NULL, NULL, NULL, TRUE, TRUE
-FROM payment_methods pm WHERE pm.code = 'multicaixa_express';
+FROM payment_methods pm WHERE pm.code = 'bank_transfer';
 
 INSERT INTO settings (`key`, value, label, description) VALUES
     ('commission_system_pct', '2.00', 'Taxa do sistema (%)', 'Percentagem da comissão para o sistema com afiliado válido.'),

@@ -6,6 +6,115 @@ class RequestChatMessage extends ManipularBanco
 {
     protected $table = 'request_chat_messages';
 
+    public const NEGOTIATION_CONTACT_POLICY_MARKER = '[[policy:negotiation_contact]]';
+
+    public const NEGOTIATION_CONTACT_POLICY_TEXT =
+        'É proibido partilhar informações de contacto (telefone, e-mail, redes sociais ou similares) '
+        . 'através deste chat. O incumprimento pode resultar na desativação da conta e na aplicação '
+        . 'de outras medidas mais rigorosas pela plataforma.';
+
+    public const CLOSING_WON_PLATFORM_VISIT_MARKER = '[[policy:closing_won_platform_visit]]';
+
+    public static function closingWonPlatformVisitChatText(): string
+    {
+        return 'O negócio foi marcado como fecho ganho. A plataforma entrará em contacto com ambas as partes '
+            . 'através dos dados cadastrados no sistema para agendar a visita ao imóvel e efectuar a '
+            . 'avaliação final. O solicitante deverá declarar o pagamento na plataforma apenas após visitar '
+            . 'o imóvel e confirmar que tudo está conforme acordado.';
+    }
+
+    public static function closingWonPlatformVisitNotificationText(bool $forRequester, string $propertyTitle = ''): string
+    {
+        $propertyPart = $propertyTitle !== '' ? ' do imóvel "' . $propertyTitle . '"' : '';
+        $base = 'A plataforma entrará em contacto consigo através dos dados cadastrados no sistema '
+            . 'para agendar a visita ao imóvel' . $propertyPart . ' e efectuar a avaliação final do negócio.';
+
+        if ($forRequester) {
+            return $base . ' Após visitar o imóvel e confirmar que tudo está conforme acordado, '
+                . 'poderá declarar o pagamento na plataforma.';
+        }
+
+        return $base;
+    }
+
+    public static function displayText(string $messageText): string
+    {
+        return trim((string) preg_replace('/\[\[policy:[^\]]+\]\]\s*/', '', $messageText));
+    }
+
+    public static function threadHasSystemMarker(int $threadId, string $marker): bool
+    {
+        if ($threadId <= 0 || trim($marker) === '') {
+            return false;
+        }
+
+        $db = new self();
+        $sql = "SELECT id FROM {$db->table}
+                WHERE thread_id = ?
+                  AND message_type = 'system'
+                  AND deleted_at IS NULL
+                  AND message_text LIKE ?
+                LIMIT 1";
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$threadId, '%' . $marker . '%']);
+
+        return (bool) $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    public static function ensureNegotiationContactPolicyMessage(int $requestId): void
+    {
+        if ($requestId <= 0) {
+            return;
+        }
+
+        $thread = RequestChatThread::findByRequestId($requestId);
+        if (!$thread || empty($thread['id'])) {
+            return;
+        }
+
+        $threadId = (int) $thread['id'];
+        if (self::threadHasSystemMarker($threadId, self::NEGOTIATION_CONTACT_POLICY_MARKER)) {
+            return;
+        }
+
+        $request = Request::findById($requestId);
+        $senderId = (int) ($request['user_id'] ?? 0);
+        if ($senderId <= 0) {
+            return;
+        }
+
+        self::createForThread(
+            $threadId,
+            $senderId,
+            self::NEGOTIATION_CONTACT_POLICY_MARKER . ' ' . self::NEGOTIATION_CONTACT_POLICY_TEXT,
+            'system'
+        );
+    }
+
+    public static function postClosingWonPlatformVisitMessage(int $requestId, int $actorUserId): void
+    {
+        if ($requestId <= 0 || $actorUserId <= 0) {
+            return;
+        }
+
+        $thread = RequestChatThread::getOrCreateByRequestId($requestId);
+        if (!$thread || empty($thread['id'])) {
+            return;
+        }
+
+        $threadId = (int) $thread['id'];
+        if (self::threadHasSystemMarker($threadId, self::CLOSING_WON_PLATFORM_VISIT_MARKER)) {
+            return;
+        }
+
+        self::createForThread(
+            $threadId,
+            $actorUserId,
+            self::CLOSING_WON_PLATFORM_VISIT_MARKER . ' ' . self::closingWonPlatformVisitChatText(),
+            'system'
+        );
+    }
+
     public static function findByAttachmentPath(string $attachmentPath): ?array
     {
         $attachmentPath = trim((string) $attachmentPath);
@@ -47,7 +156,13 @@ class RequestChatMessage extends ManipularBanco
                         WHERE um.thread_id = t.id
                           AND um.sender_user_id <> ?
                           AND um.deleted_at IS NULL
-                          AND um.created_at > COALESCE(chat_reads.last_read_at, '1970-01-01 00:00:00')
+                          AND (
+                            (COALESCE(chat_reads.last_read_message_id, 0) > 0 AND um.id > chat_reads.last_read_message_id)
+                            OR (
+                                COALESCE(chat_reads.last_read_message_id, 0) = 0
+                                AND um.created_at > COALESCE(chat_reads.last_read_at, '1970-01-01 00:00:00')
+                            )
+                          )
                     ), 0) AS unread_count";
             $params = array_merge([$userId], $requestIds);
         }
@@ -157,24 +272,23 @@ class RequestChatMessage extends ManipularBanco
                 FROM (
                     SELECT COUNT(*) AS unread_in_thread
                     FROM {$db->table} m
+                    JOIN request_chat_reads cr
+                      ON cr.thread_id = m.thread_id
+                     AND cr.user_id = ?
                     WHERE m.sender_user_id <> ?
                       AND m.deleted_at IS NULL
-                      AND m.thread_id IN (
-                        SELECT DISTINCT thread_id
-                        FROM request_chat_reads
-                        WHERE user_id = ?
+                      AND (
+                        (COALESCE(cr.last_read_message_id, 0) > 0 AND m.id > cr.last_read_message_id)
+                        OR (
+                            COALESCE(cr.last_read_message_id, 0) = 0
+                            AND m.created_at > COALESCE(cr.last_read_at, '1970-01-01 00:00:00')
+                        )
                       )
-                      AND m.created_at > COALESCE((
-                        SELECT MAX(cr.last_read_at)
-                        FROM request_chat_reads cr
-                        WHERE cr.thread_id = m.thread_id
-                          AND cr.user_id = ?
-                      ), '1970-01-01 00:00:00')
                     GROUP BY m.thread_id
                 ) unread_threads";
 
         $stmt = $db->prepare($sql);
-        $stmt->execute([$userId, $userId, $userId]);
+        $stmt->execute([$userId, $userId]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         return (int) ($result['total_unread'] ?? 0);
@@ -192,29 +306,28 @@ class RequestChatMessage extends ManipularBanco
                 FROM (
                     SELECT COUNT(*) AS unread_in_thread
                     FROM {$db->table} m
+                    JOIN request_chat_threads rt ON rt.id = m.thread_id
+                    JOIN requests r ON r.id = rt.request_id
+                    JOIN request_chat_reads cr
+                      ON cr.thread_id = m.thread_id
+                     AND cr.user_id = ?
                     WHERE m.sender_user_id <> ?
                       AND m.deleted_at IS NULL
-                      AND m.thread_id IN (
-                        SELECT DISTINCT rt.id
-                        FROM request_chat_threads rt
-                        JOIN requests r ON rt.request_id = r.id
-                        JOIN request_chat_reads cr ON rt.id = cr.thread_id
-                        WHERE cr.user_id = ?
-                          AND (r.user_id = ? OR r.property_id IN (
+                      AND (r.user_id = ? OR r.property_id IN (
                             SELECT p.id FROM properties p WHERE p.affiliate_id = ?
                           ))
+                      AND (
+                        (COALESCE(cr.last_read_message_id, 0) > 0 AND m.id > cr.last_read_message_id)
+                        OR (
+                            COALESCE(cr.last_read_message_id, 0) = 0
+                            AND m.created_at > COALESCE(cr.last_read_at, '1970-01-01 00:00:00')
+                        )
                       )
-                      AND m.created_at > COALESCE((
-                        SELECT MAX(cr.last_read_at)
-                        FROM request_chat_reads cr
-                        WHERE cr.thread_id = m.thread_id
-                          AND cr.user_id = ?
-                      ), '1970-01-01 00:00:00')
                     GROUP BY m.thread_id
                 ) unread_threads";
 
         $stmt = $db->prepare($sql);
-        $stmt->execute([$userId, $userId, $userId, $userId, $userId]);
+        $stmt->execute([$userId, $userId, $userId, $userId]);
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         return (int) ($result['total_unread'] ?? 0);

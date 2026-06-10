@@ -19,6 +19,8 @@ if ($isDashboardLayout) {
 $dashboardView = isset($_GET['view']) ? trim((string) $_GET['view']) : '';
 $dashboardMobileMenuHub = $isDashboardLayout && $dashboardSection === 'index' && $dashboardView !== 'overview';
 $isDashboardOverviewView = $isDashboardLayout && $dashboardSection === 'index' && $dashboardView === 'overview';
+$unreadChatMessagesForTabbar = (int) ($headerShell['unread_chat_messages'] ?? 0);
+$unreadNotificationsForTabbar = (int) ($headerShell['unread_notifications'] ?? 0);
 $dashboardNotificationsUrl = DIRPAGE . 'notification/inbox';
 $dashboardShellUser = Src\classes\ClassAuth::check() ? Src\classes\ClassAuth::user() : null;
 $headerShell = isset($headerShell) && is_array($headerShell) ? $headerShell : [];
@@ -26,7 +28,10 @@ $dashboardMenuItems = isset($dashboardMenu) && is_array($dashboardMenu) ? $dashb
 $shellFlags = is_array($headerShell['flags'] ?? null) ? $headerShell['flags'] : [];
 $isLimitedPlatformUser = !empty($shellFlags['is_limited'])
     || ($dashboardShellUser && Src\classes\ClassAccess::hasLimitedPlatformAccess($dashboardShellUser));
-$dashboardPanelHref = $isLimitedPlatformUser ? DIRPAGE . 'dashboard/accountStatus' : DIRPAGE . 'dashboard';
+$dashboardPanelHref = $isLimitedPlatformUser
+    ? DIRPAGE . 'dashboard/accountStatus'
+    : DIRPAGE . 'dashboard?view=overview';
+$dashboardMenuHubHref = DIRPAGE . 'dashboard';
 $isAuthLayout = strpos($currentViewDir, 'auth/') === 0;
 
 $rawSuccess = isset($_GET['success']) ? trim((string) $_GET['success']) : '';
@@ -74,7 +79,12 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
     <?php endif; ?>
 
     <title><?php echo Src\classes\ClassSEO::sanitizeTitle($this->getTitle()); ?></title>
-    
+
+    <!-- Favicon -->
+    <link rel="icon" href="<?php echo htmlspecialchars(Src\classes\ClassSEO::faviconIcoUrl(), ENT_QUOTES, 'UTF-8'); ?>" sizes="any">
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars(Src\classes\ClassSEO::faviconPngUrl(), ENT_QUOTES, 'UTF-8'); ?>" sizes="32x32">
+    <link rel="apple-touch-icon" href="<?php echo htmlspecialchars(Src\classes\ClassSEO::appleTouchIconUrl(), ENT_QUOTES, 'UTF-8'); ?>">
+
     <!-- Canonical URL -->
     <?php if ($this->getCanonical()): ?>
     <link rel="canonical" href="<?php echo htmlspecialchars($this->getCanonical(), ENT_QUOTES, 'UTF-8'); ?>">
@@ -110,7 +120,7 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
 
     <link rel="preconnect" href="https://i.ytimg.com" crossorigin>
     <link rel="preconnect" href="https://www.youtube-nocookie.com">
-    <link rel="stylesheet" href="<?php echo DIRCSS.'Style.css?v=20260601w'?>">
+    <link rel="stylesheet" href="<?php echo DIRCSS.'Style.css?v=20260610q'?>">
     <link rel="stylesheet" href="<?php echo DIRPAGE; ?>public/vendor/font-awesome/css/font-awesome.min.css?v=4.7.0">
 </head>
 <body class="<?php
@@ -123,6 +133,9 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
     }
     if ($isDashboardOverviewView) {
         $bodyClasses[] = 'dashboard-overview-view';
+    }
+    if ($isDashboardLayout) {
+        $bodyClasses[] = 'dashboard-has-mobile-tabbar';
     }
     echo implode(' ', $bodyClasses);
 ?>" data-cookie-behavioral="<?php echo htmlspecialchars($cookieConsentValue !== '' ? $cookieConsentValue : 'unknown'); ?>">
@@ -204,6 +217,7 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
                   <?php endif; ?>
               </a>
               <?php endif; ?>
+              <div id="notificationAriaLive" class="notification-aria-live" aria-live="polite" aria-atomic="true"></div>
               <?php if ($showNotificationsMenu): ?>
               <div class="notification-menu" id="notificationMenu" data-feed-url="<?php echo DIRPAGE; ?>dashboard/notificationsFeed" data-dashboard-url="<?php echo $dashboardNotificationsUrl; ?>" data-archive-url="<?php echo DIRPAGE . 'notification/archiveItem'; ?>" data-unread-initial="<?php echo (int) $unreadNotifications; ?>">
                   <button type="button" class="notification-link notification-trigger" title="Notificações" aria-label="Notificações" aria-expanded="false" aria-controls="notificationDropdown">
@@ -215,43 +229,32 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
 
                   <div class="notification-dropdown-backdrop" id="notificationDropdownBackdrop" hidden aria-hidden="true"></div>
 
-                  <div class="notification-dropdown" id="notificationDropdown" role="dialog" aria-label="Notificações recentes">
+                  <div class="notification-dropdown" id="notificationDropdown" role="dialog" aria-label="Notificações recentes" aria-modal="true">
+                      <div class="notification-sheet-handle" aria-hidden="true"></div>
                       <div class="notification-dropdown-head">
-                          <strong>Notificações</strong>
-                          <div class="notification-dropdown-head-actions">
-                              <span class="notification-dropdown-unread" id="notificationUnreadLabel"<?php echo $unreadNotifications > 0 ? '' : ' hidden'; ?>><?php echo (int) $unreadNotifications; ?> não lidas</span>
+                          <div class="notification-dropdown-title-row">
+                              <strong>Notificações</strong>
                               <button type="button" class="notification-dropdown-close" id="notificationDropdownClose" aria-label="Fechar notificações">
                                   <i class="fa fa-times" aria-hidden="true"></i>
                               </button>
                           </div>
+                          <div class="notification-dropdown-toolbar">
+                              <span class="notification-dropdown-unread" id="notificationUnreadLabel"<?php echo $unreadNotifications > 0 ? '' : ' hidden'; ?>><?php echo (int) $unreadNotifications; ?> não lidas</span>
+                              <form action="<?php echo DIRPAGE; ?>dashboard/markNotificationsRead" method="POST" class="notification-read-form notification-read-form--inline" id="notificationReadForm"<?php echo $unreadNotifications > 0 ? '' : ' hidden'; ?>>
+                                  <?php echo Src\classes\ClassCsrf::field(); ?>
+                                  <button type="submit" class="notification-read-btn notification-read-btn--text">Marcar todas como lidas</button>
+                              </form>
+                          </div>
                       </div>
 
-                      <form action="<?php echo DIRPAGE; ?>dashboard/markNotificationsRead" method="POST" class="notification-read-form" id="notificationReadForm"<?php echo $unreadNotifications > 0 ? '' : ' hidden'; ?>>
-                          <?php echo Src\classes\ClassCsrf::field(); ?>
-                          <button type="submit" class="notification-read-btn">Marcar todas como lidas</button>
-                      </form>
-
                       <?php if (!empty($headerNotifications)): ?>
-                          <div class="notification-list" id="notificationList">
+                          <div class="notification-list notification-feed notification-feed--dropdown" id="notificationList">
                               <?php foreach ($headerNotifications as $notification): ?>
-                                  <article class="notification-item <?php echo !empty($notification['is_read']) ? 'is-read' : 'is-unread'; ?>" data-notification-id="<?php echo (int) ($notification['id'] ?? 0); ?>">
-                                      <a href="<?php echo htmlspecialchars((string) ($notification['target_url'] ?? $dashboardNotificationsUrl)); ?>"
-                                         class="notification-item-main"
-                                         data-notification-id="<?php echo (int) ($notification['id'] ?? 0); ?>"
-                                         data-notification-read-url="<?php echo DIRPAGE; ?>dashboard/markNotificationRead/<?php echo (int) ($notification['id'] ?? 0); ?>">
-                                          <span class="notification-item-meta">
-                                              <span class="notification-type-badge"><?php echo htmlspecialchars((string) ($notification['type_label'] ?? 'Notificação')); ?></span>
-                                          </span>
-                                          <strong><?php echo htmlspecialchars($notification['title']); ?></strong>
-                                          <p><?php echo htmlspecialchars($notification['message']); ?></p>
-                                          <small><?php echo date('d/m/Y H:i', strtotime($notification['created_at'])); ?> · <?php echo htmlspecialchars((string) ($notification['action_label'] ?? 'Abrir')); ?></small>
-                                      </a>
-                                      <button type="button"
-                                              class="notification-toggle-read-btn"
-                                              data-notification-id="<?php echo (int) ($notification['id'] ?? 0); ?>"
-                                              data-notification-unread-url="<?php echo DIRPAGE; ?>dashboard/markNotificationUnread/<?php echo (int) ($notification['id'] ?? 0); ?>"
-                                              <?php echo !empty($notification['is_read']) ? '' : 'hidden'; ?>>Marcar não lido</button>
-                                  </article>
+                                  <?php
+                                      $compact = true;
+                                      $showMenu = false;
+                                      require __DIR__ . '/partials/notification_feed_item.php';
+                                  ?>
                               <?php endforeach; ?>
                           </div>
                       <?php else: ?>
@@ -328,6 +331,11 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
                 </div>
             </div>
 
+            <div class="dashboard-mobile-hub-intro">
+                <h2>O seu painel</h2>
+                <p>Escolha uma área para continuar</p>
+            </div>
+
             <div class="dashboard-sidebar-panel">
                 <div class="dashboard-sidebar-kicker">Painel</div>
                 <nav class="dashboard-side-nav">
@@ -362,7 +370,7 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
         <section class="dashboard-shell-content">
             <?php if (!$dashboardMobileMenuHub): ?>
                 <nav class="dashboard-mobile-nav" aria-label="Navegação do painel">
-                    <a href="<?php echo DIRPAGE; ?>dashboard" class="dashboard-mobile-nav-back">
+                    <a href="<?php echo htmlspecialchars($dashboardMenuHubHref, ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-mobile-nav-back">
                         <i class="fa fa-arrow-left" aria-hidden="true"></i>
                         <span>Menu do painel</span>
                     </a>
@@ -371,6 +379,11 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
             <?php $this->addMain();?>
         </section>
     </div>
+    <?php
+        $unreadChatMessages = $unreadChatMessagesForTabbar;
+        $unreadNotifications = $unreadNotificationsForTabbar;
+        require DIRREQ . 'app/view/partials/dashboard_mobile_tabbar.php';
+    ?>
 <?php else: ?>
 <?php $this->addMain();?>
 <?php endif; ?>
@@ -467,6 +480,6 @@ $overdueCommissionBannerHref = (string) ($overdueCommission['action_href'] ?? DI
         </div>
     </div>
 </section>
-<script src="<?php echo DIRJS.'script.js?v=20260601s'?>"></script>
+<script src="<?php echo DIRJS.'script.js?v=20260610f'?>"></script>
 </body>
 </html>             

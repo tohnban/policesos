@@ -1,4 +1,7 @@
 <?php
+
+use Src\classes\FeedGrouping;
+
 /** @var array $user */
 /** @var array $pendingCommissions */
 /** @var array $historyCommissions */
@@ -28,14 +31,24 @@ $commissionPaymentsTabUrl = static function (string $tab) use ($activeTab): stri
 
     return empty($params) ? $base : $base . '?' . http_build_query($params);
 };
+
+$pendingGroups = FeedGrouping::byDueUrgency($pendingCommissions, 'due_at');
 ?>
 
-<div class="container dashboard-view commission-payments-view">
-    <section class="dashboard-view-hero compact">
-        <div>
-            <span class="dashboard-hero-kicker">Financeiro</span>
-            <h1>Pagar comissões</h1>
-            <p>Regularize as comissões dos fechos comerciais dos seus imóveis. Envie o comprovativo para validação da equipa.</p>
+<div class="container dashboard-view notification-inbox-view commission-payments-view payment-account-feed-view">
+    <section class="notification-inbox-hero">
+        <div class="notification-inbox-hero-main">
+            <h1>Comissões a pagar</h1>
+            <p class="notification-inbox-hero-meta">
+                <span>Regularize os valores dos negócios fechados</span>
+                <?php if ($pendingCount > 0): ?>
+                    <span class="notification-feed-dot" aria-hidden="true">·</span>
+                    <span class="notification-inbox-unread-pill"><?php echo (int) $pendingCount; ?> por tratar</span>
+                <?php endif; ?>
+            </p>
+        </div>
+        <div class="notification-inbox-hero-actions">
+            <a href="<?php echo DIRPAGE; ?>dashboard/paymentHistory" class="notification-inbox-text-btn">Ver movimentos</a>
         </div>
     </section>
 
@@ -52,177 +65,82 @@ $commissionPaymentsTabUrl = static function (string $tab) use ($activeTab): stri
         <div class="sub-feedback success"><?php echo htmlspecialchars((string) $_GET['success']); ?></div>
     <?php endif; ?>
 
-    <div class="dashboard-tab-nav commission-payments-tab-nav">
-        <a href="<?php echo htmlspecialchars($commissionPaymentsTabUrl('pendentes')); ?>"
-           class="dashboard-tab-link <?php echo $activeTab === 'pendentes' ? 'is-active' : ''; ?>">
-            <i class="fa fa-clock-o"></i> Pendentes
-            <?php if ($pendingCount > 0): ?>
-                <span class="dashboard-tab-badge"><?php echo $pendingCount; ?></span>
-            <?php endif; ?>
-        </a>
-        <a href="<?php echo htmlspecialchars($commissionPaymentsTabUrl('pago')); ?>"
-           class="dashboard-tab-link <?php echo $activeTab === 'pago' ? 'is-active' : ''; ?>">
-            <i class="fa fa-check-circle"></i> Pagas
-            <?php if (($historyCounts['pago'] ?? 0) > 0): ?>
-                <span class="dashboard-tab-badge"><?php echo (int) $historyCounts['pago']; ?></span>
-            <?php endif; ?>
-        </a>
-        <a href="<?php echo htmlspecialchars($commissionPaymentsTabUrl('cancelado')); ?>"
-           class="dashboard-tab-link <?php echo $activeTab === 'cancelado' ? 'is-active' : ''; ?>">
-            <i class="fa fa-ban"></i> Canceladas
-            <?php if (($historyCounts['cancelado'] ?? 0) > 0): ?>
-                <span class="dashboard-tab-badge"><?php echo (int) $historyCounts['cancelado']; ?></span>
-            <?php endif; ?>
-        </a>
+    <div class="requests-scope-navigation commission-payments-scope">
+        <div class="requests-scope-pills">
+            <a href="<?php echo htmlspecialchars($commissionPaymentsTabUrl('pendentes')); ?>"
+               class="requests-scope-pill <?php echo $activeTab === 'pendentes' ? 'is-active' : ''; ?>"
+               aria-current="<?php echo $activeTab === 'pendentes' ? 'page' : 'false'; ?>">
+                <i class="fa fa-clock-o" aria-hidden="true"></i>
+                <span>Pendentes</span>
+                <?php if ($pendingCount > 0): ?>
+                    <span class="requests-scope-pill-badge"><?php echo (int) $pendingCount; ?></span>
+                <?php endif; ?>
+            </a>
+            <a href="<?php echo htmlspecialchars($commissionPaymentsTabUrl('pago')); ?>"
+               class="requests-scope-pill <?php echo $activeTab === 'pago' ? 'is-active' : ''; ?>"
+               aria-current="<?php echo $activeTab === 'pago' ? 'page' : 'false'; ?>">
+                <i class="fa fa-check-circle" aria-hidden="true"></i>
+                <span>Pagas</span>
+            </a>
+            <a href="<?php echo htmlspecialchars($commissionPaymentsTabUrl('cancelado')); ?>"
+               class="requests-scope-pill <?php echo $activeTab === 'cancelado' ? 'is-active' : ''; ?>"
+               aria-current="<?php echo $activeTab === 'cancelado' ? 'page' : 'false'; ?>">
+                <i class="fa fa-ban" aria-hidden="true"></i>
+                <span>Canceladas</span>
+            </a>
+        </div>
     </div>
 
     <?php if ($activeTab === 'pendentes'): ?>
-        <div class="dashboard-module-card">
-            <div class="dashboard-module-head compact">
-                <div>
-                    <span class="dashboard-module-kicker">Pendentes</span>
-                    <h3>Comissões a regularizar</h3>
-                </div>
-            </div>
-
-            <?php if (!empty($pendingCommissions)): ?>
-                <div class="commission-payments-list">
-                    <?php foreach ($pendingCommissions as $commission): ?>
-                        <?php
-                            $commissionId = (int) ($commission['id'] ?? 0);
-                            $amount = (float) ($commission['amount'] ?? 0);
-                            $dueAt = (string) ($commission['due_at'] ?? '');
-                            $dueLabel = $dueAt !== '' ? date('d/m/Y H:i', strtotime($dueAt)) : '—';
-                            $isOverdue = $dueAt !== '' && strtotime($dueAt) < time();
-                            $ownerPayStatus = App\model\Commission::resolveOwnerPaymentStatus($commission);
-                            $submitted = $ownerPayStatus === App\model\Commission::OWNER_PAYMENT_ENVIADO;
-                            $rejected = $ownerPayStatus === App\model\Commission::OWNER_PAYMENT_REJEITADO;
-                            $rejectReason = trim((string) ($commission['owner_payment_rejection_reason'] ?? ''));
-                        ?>
-                        <article class="commission-payments-item <?php echo $isOverdue ? 'is-overdue' : ''; ?> <?php echo $submitted ? 'is-awaiting' : ''; ?> <?php echo $rejected ? 'is-rejected' : ''; ?>">
-                            <div class="commission-payments-item-main">
-                                <h4>
-                                    <a href="<?php echo DIRPAGE; ?>property/<?php echo (int) ($commission['property_id'] ?? 0); ?>" class="table-name-link">
-                                        <?php echo htmlspecialchars((string) ($commission['property_title'] ?? 'Imóvel')); ?>
-                                    </a>
-                                </h4>
-                                <p class="commission-payments-amount">
-                                    Pague <strong><?php echo number_format($amount, 0, ',', '.'); ?> Kz</strong>
-                                    até <strong><?php echo htmlspecialchars($dueLabel); ?></strong>
-                                </p>
-                                <?php if ((float) ($commission['system_amount'] ?? 0) > 0 || (float) ($commission['affiliate_amount'] ?? 0) > 0): ?>
-                                    <small class="dashboard-inline-note">
-                                        Plataforma: <?php echo number_format((float) ($commission['system_amount'] ?? 0), 0, ',', '.'); ?> Kz
-                                        <?php if ((float) ($commission['affiliate_amount'] ?? 0) > 0): ?>
-                                            · Afiliado: <?php echo number_format((float) ($commission['affiliate_amount'] ?? 0), 0, ',', '.'); ?> Kz
-                                        <?php endif; ?>
-                                    </small>
-                                <?php endif; ?>
-                            </div>
-                            <div class="commission-payments-item-actions">
-                                <?php if ($submitted): ?>
-                                    <span class="request-status-badge request-status-em_analise">Aguardando validação</span>
-                                <?php elseif ($rejected): ?>
-                                    <span class="request-status-badge request-status-expirado">Comprovativo rejeitado</span>
-                                    <?php if ($rejectReason !== ''): ?>
-                                        <small class="dashboard-inline-note"><?php echo htmlspecialchars($rejectReason); ?></small>
-                                    <?php endif; ?>
-                                    <a href="<?php echo DIRPAGE; ?>dashboard/commissionPayment/<?php echo $commissionId; ?>" class="btn-primary">Reenviar comprovativo</a>
-                                <?php elseif ($isOverdue): ?>
-                                    <span class="request-status-badge request-status-expirado">Vencida</span>
-                                    <a href="<?php echo DIRPAGE; ?>dashboard/commissionPayment/<?php echo $commissionId; ?>" class="btn-primary">Enviar comprovativo</a>
-                                <?php else: ?>
-                                    <span class="request-status-badge request-status-pendente">Pendente</span>
-                                    <a href="<?php echo DIRPAGE; ?>dashboard/commissionPayment/<?php echo $commissionId; ?>" class="btn-primary">Pagar agora</a>
-                                <?php endif; ?>
-                            </div>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <p class="dashboard-empty-copy">Não tem comissões pendentes de pagamento.</p>
-            <?php endif; ?>
+        <div class="notification-inbox-panel payment-account-feed-panel">
+            <?php
+                $shellHasItems = !empty($pendingCommissions);
+                $shellEmptyIcon = 'fa-money';
+                $shellEmptyTitle = 'Está tudo em dia';
+                $shellEmptyMessage = 'Não tem comissões por pagar neste momento.';
+                $feedGroups = $pendingGroups;
+                $shellFeedItemPartial = 'commission_pending_feed_item.php';
+                $shellFeedItemVarName = 'commission';
+                $shellFeedExtraClass = 'commission-pending-feed';
+                require __DIR__ . '/../../partials/user_feed_shell.php';
+            ?>
         </div>
     <?php else: ?>
         <?php
-            $historyTitle = $activeTab === 'pago' ? 'Comissões pagas' : 'Comissões canceladas';
-            $historyKicker = $activeTab === 'pago' ? 'Liquidadas' : 'Anuladas';
+            $historyTitle = $activeTab === 'pago' ? 'Comissões já pagas' : 'Comissões canceladas';
             $emptyCopy = $activeTab === 'pago'
-                ? 'Ainda não tem comissões pagas registadas.'
+                ? 'Quando concluir um pagamento, o registo aparece aqui.'
                 : 'Não tem comissões canceladas.';
+            $historyDateField = static function (array $commission): string {
+                $paidAt = (string) ($commission['paid_at'] ?? '');
+                $validatedAt = (string) ($commission['owner_payment_validated_at'] ?? '');
+                $createdAt = (string) ($commission['created_at'] ?? '');
+
+                return $paidAt !== '' ? $paidAt : ($validatedAt !== '' ? $validatedAt : $createdAt);
+            };
+            $historyForGrouping = array_map(static function (array $commission) use ($historyDateField): array {
+                $commission['_feed_date'] = $historyDateField($commission);
+
+                return $commission;
+            }, $historyCommissions);
+            $historyGroups = FeedGrouping::byRecency($historyForGrouping, '_feed_date');
         ?>
-        <div class="dashboard-module-card">
-            <div class="dashboard-module-head compact">
-                <div>
-                    <span class="dashboard-module-kicker"><?php echo htmlspecialchars($historyKicker); ?></span>
-                    <h3><?php echo htmlspecialchars($historyTitle); ?></h3>
-                </div>
+        <div class="notification-inbox-panel payment-account-feed-panel">
+            <div class="requests-inbox-panel-toolbar">
+                <h2 class="requests-inbox-panel-title"><?php echo htmlspecialchars($historyTitle); ?></h2>
             </div>
 
-            <?php if (!empty($historyCommissions)): ?>
-                <div class="dashboard-table-wrap commission-payments-history-wrap">
-                    <table class="dashboard-table commissions-table commission-payments-history-table">
-                        <thead>
-                            <tr>
-                                <th>Imóvel</th>
-                                <th>Valor</th>
-                                <th>Estado</th>
-                                <th>Comprovativo</th>
-                                <th>Referência</th>
-                                <th>Data</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($historyCommissions as $commission): ?>
-                                <?php
-                                    $amount = (float) ($commission['amount'] ?? 0);
-                                    $statusKey = (string) ($commission['status'] ?? $activeTab);
-                                    $ownerPayStatus = App\model\Commission::resolveOwnerPaymentStatus($commission);
-                                    $ownerRef = trim((string) ($commission['owner_payment_reference'] ?? ''));
-                                    if ($ownerRef === '') {
-                                        $ownerRef = trim((string) ($commission['payment_reference'] ?? ''));
-                                    }
-                                    $paidAt = (string) ($commission['paid_at'] ?? '');
-                                    $validatedAt = (string) ($commission['owner_payment_validated_at'] ?? '');
-                                    $createdAt = (string) ($commission['created_at'] ?? '');
-                                    $dateRaw = $paidAt !== '' ? $paidAt : ($validatedAt !== '' ? $validatedAt : $createdAt);
-                                    $dateLabel = $dateRaw !== '' ? date('d/m/Y H:i', strtotime($dateRaw)) : '—';
-                                ?>
-                                <tr class="commission-payments-history-row">
-                                    <td data-label="Imóvel" class="col-stack">
-                                        <a href="<?php echo DIRPAGE; ?>property/<?php echo (int) ($commission['property_id'] ?? 0); ?>" class="table-name-link">
-                                            <?php echo htmlspecialchars((string) ($commission['property_title'] ?? 'Imóvel')); ?>
-                                        </a>
-                                        <?php if ((float) ($commission['system_amount'] ?? 0) > 0 || (float) ($commission['affiliate_amount'] ?? 0) > 0): ?>
-                                            <small class="dashboard-inline-note">
-                                                Plataforma: <?php echo number_format((float) ($commission['system_amount'] ?? 0), 0, ',', '.'); ?> Kz
-                                                <?php if ((float) ($commission['affiliate_amount'] ?? 0) > 0): ?>
-                                                    · Afiliado: <?php echo number_format((float) ($commission['affiliate_amount'] ?? 0), 0, ',', '.'); ?> Kz
-                                                <?php endif; ?>
-                                            </small>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="dashboard-cell-nowrap" data-label="Valor">
-                                        <strong><?php echo number_format($amount, 0, ',', '.'); ?> Kz</strong>
-                                    </td>
-                                    <td data-label="Estado" class="col-stack">
-                                        <span class="commission-status-badge commission-status-<?php echo htmlspecialchars($statusKey); ?>">
-                                            <?php echo htmlspecialchars(App\model\Commission::statusLabel($statusKey)); ?>
-                                        </span>
-                                    </td>
-                                    <td class="dashboard-inline-note" data-label="Comprovativo">
-                                        <?php echo htmlspecialchars(App\model\Commission::ownerPaymentStatusLabel($ownerPayStatus)); ?>
-                                    </td>
-                                    <td class="dashboard-inline-note" data-label="Referência"><?php echo $ownerRef !== '' ? htmlspecialchars($ownerRef) : '—'; ?></td>
-                                    <td class="dashboard-cell-nowrap" data-label="Data"><?php echo htmlspecialchars($dateLabel); ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php else: ?>
-                <p class="dashboard-empty-copy"><?php echo htmlspecialchars($emptyCopy); ?></p>
-            <?php endif; ?>
+            <?php
+                $shellHasItems = !empty($historyCommissions);
+                $shellEmptyIcon = 'fa-money';
+                $shellEmptyTitle = $activeTab === 'pago' ? 'Ainda sem pagamentos' : 'Nada cancelado';
+                $shellEmptyMessage = $emptyCopy;
+                $feedGroups = $historyGroups;
+                $shellFeedItemPartial = 'commission_history_feed_item.php';
+                $shellFeedItemVarName = 'commission';
+                $shellFeedExtraClass = 'commission-account-feed';
+                require __DIR__ . '/../../partials/user_feed_shell.php';
+            ?>
         </div>
     <?php endif; ?>
 </div>

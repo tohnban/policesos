@@ -48,16 +48,21 @@ $boostEligible = array_filter($properties ?? [], static function ($p) use ($pend
 });
 ?>
 
-<div class="container dashboard-view my-properties-dashboard-view">
-    <section class="dashboard-view-hero compact my-properties-hero">
-        <div>
-            <span class="dashboard-hero-kicker">Portfólio</span>
+<div class="container dashboard-view notification-inbox-view my-properties-dashboard-view">
+    <section class="notification-inbox-hero my-properties-hero">
+        <div class="notification-inbox-hero-main">
             <h1>Minhas Propriedades</h1>
-            <p>Gerencie os seus imóveis, acompanhe o estado dos anúncios e responda a pedidos de afiliação.</p>
+            <p class="notification-inbox-hero-meta">
+                <span><?php echo (int) $propertyCount; ?> no portfólio</span>
+                <?php if ($availableCount > 0): ?>
+                    <span class="notification-feed-dot" aria-hidden="true">·</span>
+                    <span><?php echo (int) $availableCount; ?> disponíve<?php echo $availableCount === 1 ? 'l' : 'is'; ?></span>
+                <?php endif; ?>
+            </p>
         </div>
         <?php if (!empty($properties)): ?>
-        <div class="my-properties-hero-actions">
-            <a href="<?php echo DIRPAGE; ?>property/create" class="btn-primary">Cadastrar imóvel</a>
+        <div class="notification-inbox-hero-actions">
+            <a href="<?php echo DIRPAGE; ?>property/create" class="notification-inbox-text-btn">Cadastrar imóvel</a>
         </div>
         <?php endif; ?>
     </section>

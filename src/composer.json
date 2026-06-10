@@ -1,12 +1,27 @@
 {
-    "name": "himalaias/market",
-    "description": "Projecto Himalaias",
+    "name": "tohnban/imobil",
+    "description": "Plataforma imobiliária em PHP MVC: catálogo de imóveis, solicitações, comissões, afiliação e painel administrativo.",
+    "type": "project",
+    "keywords": [
+        "imobiliario",
+        "real-estate",
+        "php",
+        "mvc",
+        "marketplace"
+    ],
+    "homepage": "https://github.com/tohnban/imobil",
+    "readme": "../README.md",
     "authors": [
         {
             "name": "Antonio Nzage Banduenga",
-            "email": "antoniobanduenga@gmail.com"
+            "email": "antoniobanduenga@gmail.com",
+            "role": "Developer"
         }
     ],
+    "support": {
+        "issues": "https://github.com/tohnban/imobil/issues",
+        "source": "https://github.com/tohnban/imobil"
+    },
     "require": {
         "php": "^8.0",
         "phpmailer/phpmailer": "^6.5",
@@ -29,7 +44,8 @@
         "quality": [
             "@quality:cs",
             "@quality:stan"
-        ]
+        ],
+        "production-deps": "composer install --no-dev --optimize-autoloader --no-interaction"
     },
     "config": {
         "sort-packages": true,

@@ -32,10 +32,11 @@ class RequestChatThread extends ManipularBanco
             'last_message_at' => null,
         ];
 
+        $created = false;
         try {
             $id = $db->Salvar($data, $db->table);
-            if (!$id) {
-                return self::findByRequestId($requestId);
+            if ($id) {
+                $created = true;
             }
         } catch (\PDOException $e) {
             if ((string) $e->getCode() !== '23000') {
@@ -43,7 +44,12 @@ class RequestChatThread extends ManipularBanco
             }
         }
 
-        return self::findByRequestId($requestId);
+        $thread = self::findByRequestId($requestId);
+        if ($thread && $created) {
+            RequestChatMessage::ensureNegotiationContactPolicyMessage($requestId);
+        }
+
+        return $thread;
     }
 
     public static function touch(int $threadId): bool
@@ -53,6 +59,17 @@ class RequestChatThread extends ManipularBanco
                 SET last_message_at = NOW(), updated_at = NOW()
                 WHERE id = ?";
         $stmt = $db->prepare($sql);
-        return (bool) $stmt->execute([$threadId]);
+        if (!$stmt->execute([$threadId])) {
+            return false;
+        }
+
+        $lookup = $db->prepare("SELECT request_id FROM {$db->table} WHERE id = ? LIMIT 1");
+        $lookup->execute([$threadId]);
+        $requestId = (int) $lookup->fetchColumn();
+        if ($requestId > 0) {
+            Request::touchLastInteraction($requestId);
+        }
+
+        return true;
     }
 }

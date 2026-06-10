@@ -3,7 +3,7 @@
 /** @var string $legalTitle */
 /** @var string $legalLead */
 ?>
-<section class="dashboard-view-hero compact" style="margin-top:1.5rem;">
+<section class="dashboard-view-hero compact legal-page-hero">
     <div>
         <span class="dashboard-hero-kicker"><?php echo htmlspecialchars($legalKicker, ENT_QUOTES, 'UTF-8'); ?></span>
         <h1><?php echo htmlspecialchars($legalTitle, ENT_QUOTES, 'UTF-8'); ?></h1>

@@ -64,6 +64,40 @@ class ClassCsrf
         return $appBase . '/' . ltrim($fallback, '/');
     }
 
+    public static function isAjaxRequest(): bool
+    {
+        return strtolower((string) ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '')) === 'xmlhttprequest';
+    }
+
+    /**
+     * Reject invalid CSRF on POST (JSON for AJAX, redirect otherwise).
+     */
+    public static function rejectPost(string $fallback = '', string $message = 'Token inválido'): void
+    {
+        if (self::isAjaxRequest()) {
+            http_response_code(400);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'success' => false,
+                'error' => $message,
+                'csrf_token' => self::get(),
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            exit;
+        }
+
+        self::failRedirect($fallback, $message);
+    }
+
+    /**
+     * Validate CSRF token on POST; reject when invalid.
+     */
+    public static function enforcePostToken(string $fallback = ''): void
+    {
+        if (!self::validate($_POST['csrf_token'] ?? '')) {
+            self::rejectPost($fallback);
+        }
+    }
+
     /**
      * Redirect back to referer (same host) or fallback with an error query param.
      */

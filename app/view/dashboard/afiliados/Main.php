@@ -15,13 +15,47 @@ function afiliadosTabUrl(string $tab, int $targetPage = 1): string {
     }
     return '?' . http_build_query($params);
 }
+
+$propertyStatusLabels = [
+    'disponivel' => 'Disponível',
+    'vendido' => 'Vendido',
+    'alugado' => 'Alugado',
+    'pendente' => 'Pendente',
+    'em_analise' => 'Em análise',
+    'rejeitado' => 'Rejeitado',
+];
+$propertyStatusChipClass = static function (string $status) use ($propertyStatusLabels): array {
+    $chipMap = [
+        'disponivel' => 'dashboard-chip-success',
+        'pendente' => 'dashboard-chip-warning',
+        'em_analise' => 'dashboard-chip-warning',
+        'rejeitado' => 'dashboard-chip-danger',
+        'vendido' => 'dashboard-chip',
+        'alugado' => 'dashboard-chip',
+    ];
+
+    return [
+        $propertyStatusLabels[$status] ?? ucfirst($status),
+        $chipMap[$status] ?? 'dashboard-chip',
+    ];
+};
+$affiliateStatusChipClass = static function (string $status): array {
+    $map = [
+        'ativo' => ['Aprovado', 'dashboard-chip-success'],
+        'pendente' => ['Pendente', 'dashboard-chip-warning'],
+        'rejeitado' => ['Rejeitado', 'dashboard-chip-danger'],
+    ];
+
+    return $map[$status] ?? ['–', 'dashboard-chip'];
+};
 ?>
-<div class="container dashboard-view afiliados-dashboard-view">
-    <section class="dashboard-view-hero compact">
-        <div>
-            <span class="dashboard-hero-kicker">Afiliação</span>
+<div class="container dashboard-view notification-inbox-view afiliados-dashboard-view">
+    <section class="notification-inbox-hero">
+        <div class="notification-inbox-hero-main">
             <h1>Afiliados</h1>
-            <p>Gestão completa do programa de afiliação — as suas indicações, comissões e os promotores dos seus imóveis.</p>
+            <p class="notification-inbox-hero-meta">
+                <span>Indicações, comissões e promotores dos seus imóveis</span>
+            </p>
         </div>
     </section>
 
@@ -31,27 +65,37 @@ function afiliadosTabUrl(string $tab, int $targetPage = 1): string {
         <div class="sub-feedback success"><?php echo htmlspecialchars((string) $_GET['success']); ?></div>
     <?php endif; ?>
 
-    <div class="dashboard-tab-nav afiliados-tab-nav">
-        <?php if ($isAffiliate): ?>
-            <a href="<?php echo afiliadosTabUrl('referrals'); ?>"
-               class="dashboard-tab-link <?php echo $activeTab === 'referrals' ? 'is-active' : ''; ?>">
-                <i class="fa fa-link"></i> Minhas Indicações
-            </a>
-            <a href="<?php echo afiliadosTabUrl('commissions'); ?>"
-               class="dashboard-tab-link <?php echo $activeTab === 'commissions' ? 'is-active' : ''; ?>">
-                <i class="fa fa-money"></i> Comissões
-            </a>
-        <?php endif; ?>
-        <?php if ($hasProperties): ?>
-          <a href="<?php echo afiliadosTabUrl('affiliate_requests'); ?>"
-              class="dashboard-tab-link <?php echo $activeTab === 'affiliate_requests' ? 'is-active' : ''; ?>">
-                <i class="fa fa-inbox"></i> Solicitações
-          </a>
-        <a href="<?php echo afiliadosTabUrl('my_affiliates'); ?>"
-           class="dashboard-tab-link <?php echo $activeTab === 'my_affiliates' ? 'is-active' : ''; ?>">
-            <i class="fa fa-users"></i> Meus Afiliados
-        </a>
-        <?php endif; ?>
+    <div class="requests-scope-navigation afiliados-scope-nav">
+        <div class="requests-scope-pills afiliados-tab-pills">
+            <?php if ($isAffiliate): ?>
+                <a href="<?php echo afiliadosTabUrl('referrals'); ?>"
+                   class="requests-scope-pill <?php echo $activeTab === 'referrals' ? 'is-active' : ''; ?>"
+                   aria-current="<?php echo $activeTab === 'referrals' ? 'page' : 'false'; ?>">
+                    <i class="fa fa-link" aria-hidden="true"></i>
+                    <span>Minhas Indicações</span>
+                </a>
+                <a href="<?php echo afiliadosTabUrl('commissions'); ?>"
+                   class="requests-scope-pill <?php echo $activeTab === 'commissions' ? 'is-active' : ''; ?>"
+                   aria-current="<?php echo $activeTab === 'commissions' ? 'page' : 'false'; ?>">
+                    <i class="fa fa-money" aria-hidden="true"></i>
+                    <span>Comissões</span>
+                </a>
+            <?php endif; ?>
+            <?php if ($hasProperties): ?>
+                <a href="<?php echo afiliadosTabUrl('affiliate_requests'); ?>"
+                   class="requests-scope-pill <?php echo $activeTab === 'affiliate_requests' ? 'is-active' : ''; ?>"
+                   aria-current="<?php echo $activeTab === 'affiliate_requests' ? 'page' : 'false'; ?>">
+                    <i class="fa fa-inbox" aria-hidden="true"></i>
+                    <span>Solicitações</span>
+                </a>
+                <a href="<?php echo afiliadosTabUrl('my_affiliates'); ?>"
+                   class="requests-scope-pill <?php echo $activeTab === 'my_affiliates' ? 'is-active' : ''; ?>"
+                   aria-current="<?php echo $activeTab === 'my_affiliates' ? 'page' : 'false'; ?>">
+                    <i class="fa fa-users" aria-hidden="true"></i>
+                    <span>Meus Afiliados</span>
+                </a>
+            <?php endif; ?>
+        </div>
     </div>
 
     <?php if ($activeTab === 'referrals' && $isAffiliate): ?>
@@ -117,12 +161,8 @@ function afiliadosTabUrl(string $tab, int $targetPage = 1): string {
                                 <td class="dashboard-cell-nowrap" data-label="Preço"><?php echo number_format((float) $prop['price'], 0, ',', '.'); ?> Kz</td>
                                 <td data-label="Indicações"><?php echo (int) ($prop['referral_count'] ?? 0); ?></td>
                                 <td data-label="Estado">
-                                    <?php
-                                        $pStatus = $prop['property_status'] ?? '';
-                                        $pLabel  = ['disponivel' => 'Disponível', 'vendido' => 'Vendido', 'alugado' => 'Alugado', 'pendente' => 'Pendente', 'em_analise' => 'Em análise', 'rejeitado' => 'Rejeitado'][$pStatus] ?? ucfirst($pStatus);
-                                        $pTone   = ['disponivel' => 'pago', 'vendido' => 'cancelado', 'alugado' => 'cancelado'][$pStatus] ?? 'pendente';
-                                    ?>
-                                    <span class="commission-status-badge commission-status-<?php echo $pTone; ?>"><?php echo $pLabel; ?></span>
+                                    <?php [$pLabel, $pChip] = $propertyStatusChipClass((string) ($prop['property_status'] ?? '')); ?>
+                                    <span class="dashboard-chip <?php echo htmlspecialchars($pChip, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($pLabel); ?></span>
                                 </td>
                                 <td data-label="Link" class="col-referral-link">
                                     <div class="referral-link-wrap">
@@ -299,12 +339,8 @@ function afiliadosTabUrl(string $tab, int $targetPage = 1): string {
                     <div class="dashboard-module-head compact">
                         <div>
                             <span class="dashboard-module-kicker">
-                                <?php
-                                    $pStatus = $property['status'] ?? '';
-                                    $pLabel  = ['disponivel' => 'Disponível', 'vendido' => 'Vendido', 'alugado' => 'Alugado', 'pendente' => 'Pendente', 'em_analise' => 'Em análise', 'rejeitado' => 'Rejeitado'][$pStatus] ?? ucfirst($pStatus);
-                                    $pTone   = ['disponivel' => 'pago', 'vendido' => 'cancelado', 'alugado' => 'cancelado'][$pStatus] ?? 'pendente';
-                                ?>
-                                <span class="commission-status-badge commission-status-<?php echo $pTone; ?>"><?php echo $pLabel; ?></span>
+                                <?php [$pLabel, $pChip] = $propertyStatusChipClass((string) ($property['status'] ?? '')); ?>
+                                <span class="dashboard-chip <?php echo htmlspecialchars($pChip, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($pLabel); ?></span>
                             </span>
                             <h3>
                                 <a href="<?php echo DIRPAGE; ?>property/<?php echo (int) $property['id']; ?>" target="_blank">
@@ -355,11 +391,8 @@ function afiliadosTabUrl(string $tab, int $targetPage = 1): string {
                                             <?php endif; ?>
                                         </td>
                                         <td data-label="Estado">
-                                            <?php
-                                                $stMap2 = ['ativo' => ['Aprovado', 'pago'], 'pendente' => ['Pendente', 'pendente'], 'rejeitado' => ['Rejeitado', 'cancelado']];
-                                                [$stLabel2, $stKey2] = $stMap2[$aff['affiliate_status'] ?? 'pendente'] ?? ['–', 'pendente'];
-                                            ?>
-                                            <span class="commission-status-badge commission-status-<?php echo $stKey2; ?>"><?php echo $stLabel2; ?></span>
+                                            <?php [$stLabel2, $stChip2] = $affiliateStatusChipClass((string) ($aff['affiliate_status'] ?? 'pendente')); ?>
+                                            <span class="dashboard-chip <?php echo htmlspecialchars($stChip2, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($stLabel2); ?></span>
                                             <?php if (!empty($aff['approved_at'])): ?>
                                                 <br><small class="dashboard-inline-note">desde <?php echo date('d/m/Y', strtotime($aff['approved_at'])); ?></small>
                                             <?php endif; ?>

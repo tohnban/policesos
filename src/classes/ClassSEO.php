@@ -34,6 +34,21 @@ class ClassSEO
         return DIRIMG . 'logo-imobilfacil.png';
     }
 
+    public static function faviconIcoUrl(): string
+    {
+        return DIRPAGE . 'public/img/favicon.ico';
+    }
+
+    public static function faviconPngUrl(): string
+    {
+        return DIRPAGE . 'public/img/favicon.png';
+    }
+
+    public static function appleTouchIconUrl(): string
+    {
+        return self::faviconPngUrl();
+    }
+
     public static function isPrivateViewDir(string $viewDir): bool
     {
         $viewDir = trim($viewDir);
@@ -324,11 +339,19 @@ class ClassSEO
         }
 
         if ($totalPages > 1) {
+            $listPath = 'properties';
+            if ($canonicalPath !== null) {
+                $pathPart = strtok(ltrim($canonicalPath, '/'), '?');
+                if (is_string($pathPart) && $pathPart !== '') {
+                    $listPath = $pathPart;
+                }
+            }
             if ($page > 1) {
-                $schema['previousPage'] = $base . '/properties?page=' . ($page - 1);
+                $prevPage = $page - 1;
+                $schema['previousPage'] = $base . '/' . $listPath . ($prevPage > 1 ? '?page=' . $prevPage : '');
             }
             if ($page < $totalPages) {
-                $schema['nextPage'] = $base . '/properties?page=' . ($page + 1);
+                $schema['nextPage'] = $base . '/' . $listPath . '?page=' . ($page + 1);
             }
         }
 

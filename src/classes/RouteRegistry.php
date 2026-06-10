@@ -24,9 +24,6 @@ final class RouteRegistry
     public static function match(string $httpMethod, array $urlSegments): ?ResolvedRoute
     {
         $path = self::segmentsToPath($urlSegments);
-        if ($path === '') {
-            return null;
-        }
 
         $httpMethod = strtoupper(trim($httpMethod));
         if ($httpMethod === '') {
@@ -115,10 +112,8 @@ final class RouteRegistry
             if (!is_array($route)) {
                 continue;
             }
-            $path = trim((string) ($route['path'] ?? ''), '/');
-            if ($path === '') {
-                continue;
-            }
+            $rawPath = (string) ($route['path'] ?? '');
+            $path = $rawPath === '/' ? '' : trim($rawPath, '/');
 
             $paramOrder = [];
             $regexBody = '';
@@ -133,7 +128,7 @@ final class RouteRegistry
                 $offset = $m[0][1] + strlen($m[0][0]);
             }
             $regexBody .= preg_quote(substr($path, $offset), '#');
-            $regex = '#^' . $regexBody . '$#i';
+            $regex = $path === '' ? '#^$#i' : '#^' . $regexBody . '$#i';
 
             self::$compiled[] = [
                 'path' => $path,

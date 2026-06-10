@@ -2,6 +2,7 @@
 
 namespace App\controller;
 
+use App\model\Document;
 use App\model\Log;
 use App\model\Request;
 use App\model\RequestChatMessage;
@@ -84,6 +85,26 @@ class ControllerFile
         $this->forbidden();
     }
 
+    private function requireDocumentAccess(array $user, string $path): void
+    {
+        if (ClassAccess::can('documents.review', $user) || ClassAccess::can('users.review', $user) || ClassAccess::isSuperAdmin($user)) {
+            return;
+        }
+
+        $filename = basename(str_replace('\\', '/', $path));
+        $doc = Document::findByFilename($filename);
+        if (!$doc) {
+            $this->notFound();
+        }
+
+        $ownerId = (int) ($doc['user_id'] ?? 0);
+        if ($ownerId > 0 && $ownerId === (int) ($user['id'] ?? 0)) {
+            return;
+        }
+
+        $this->forbidden();
+    }
+
     private function serveFileFromAbsolute(string $absPath, string $downloadName = '', bool $forceDownload = false): void
     {
         if (!is_file($absPath)) {
@@ -156,6 +177,7 @@ class ControllerFile
             'public/storage/uploads/commission_proofs/' => 'finance',
             'public/storage/uploads/commission_payout_proofs/' => 'finance',
             'public/storage/uploads/request_chat_attachments/' => 'chat',
+            'storage/documents/' => 'document',
         ];
 
         $mode = null;
@@ -176,6 +198,8 @@ class ControllerFile
             $this->requireFinanceAccess($user);
         } elseif ($mode === 'chat') {
             $this->requireChatAttachmentAccess($user, $path);
+        } elseif ($mode === 'document') {
+            $this->requireDocumentAccess($user, $path);
         } else {
             $this->forbidden();
         }

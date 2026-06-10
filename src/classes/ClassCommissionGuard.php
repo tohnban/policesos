@@ -128,6 +128,11 @@ class ClassCommissionGuard
         exit;
     }
 
+    private static function isDashboardController(string $controller): bool
+    {
+        return str_starts_with($controller, 'ControllerDashboard');
+    }
+
     private static function isExemptRoute(string $controller, array $url): bool
     {
         $routeKey = strtolower((string) ($url[0] ?? ''));
@@ -136,7 +141,7 @@ class ClassCommissionGuard
             return true;
         }
 
-        if ($routeKey !== 'dashboard' && $controller !== 'ControllerDashboard') {
+        if ($routeKey !== 'dashboard' && !self::isDashboardController($controller)) {
             return false;
         }
 
@@ -157,31 +162,50 @@ class ClassCommissionGuard
             return true;
         }
 
-        if ($routeKey === 'dashboard' || $controller === 'ControllerDashboard') {
+        if ($routeKey === 'dashboard' || self::isDashboardController($controller)) {
             return true;
         }
 
-        if ($controller === 'ControllerRequest') {
+        if (self::isRequestController($controller)) {
             return true;
         }
 
-        if ($controller === 'ControllerPayment') {
+        if ($controller === 'ControllerPayment' || str_starts_with($controller, 'ControllerPayment')) {
             return true;
         }
 
-        if ($controller === 'ControllerNotification') {
+        if (self::isNotificationController($controller)) {
             return true;
         }
 
-        if ($controller === 'ControllerApi') {
+        if ($controller === 'ControllerApi' || str_starts_with($controller, 'ControllerApi')) {
             return true;
         }
 
-        if ($controller === 'ControllerProperty') {
-            return self::shouldBlockPropertyRoute($url);
+        if (self::isPropertyController($controller)) {
+            if ($controller === 'ControllerPropertyCatalog' || $controller === 'ControllerProperty') {
+                return self::shouldBlockPropertyRoute($url);
+            }
+
+            return true;
         }
 
         return false;
+    }
+
+    private static function isPropertyController(string $controller): bool
+    {
+        return $controller === 'ControllerProperty' || str_starts_with($controller, 'ControllerProperty');
+    }
+
+    private static function isRequestController(string $controller): bool
+    {
+        return $controller === 'ControllerRequest' || str_starts_with($controller, 'ControllerRequest');
+    }
+
+    private static function isNotificationController(string $controller): bool
+    {
+        return $controller === 'ControllerNotification' || str_starts_with($controller, 'ControllerNotification');
     }
 
     private static function shouldBlockPropertyRoute(array $url): bool

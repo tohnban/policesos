@@ -14,11 +14,30 @@ Uma aplicação web moderna e responsiva para o setor imobiliário, desenvolvida
 - A pasta `antigo/` deve ser tratada como referência histórica.
 - Antes de qualquer merge/release, validar que as alterações não foram feitas apenas em `antigo/`.
 
-## Documentacao Tecnica
+## Documentacao
 
-- Ranking comportamental (autenticado e anonimo): [DOCUMENTACAO_RANKING_COMPORTAMENTAL.md](DOCUMENTACAO_RANKING_COMPORTAMENTAL.md)
-- Acessos administrativos e perfis: [DOCUMENTACAO_ACESSOS_ADMIN.md](DOCUMENTACAO_ACESSOS_ADMIN.md)
-- SEO (Search Engine Optimization): [DOCUMENTACAO_SEO.md](DOCUMENTACAO_SEO.md)
+**Indice completo:** [DOCUMENTACAO_INDICE.md](DOCUMENTACAO_INDICE.md)
+
+### Arquitectura e operacao
+- [DOCUMENTACAO_ARQUITETURA.md](DOCUMENTACAO_ARQUITETURA.md) — rotas, MVC, guards, cache, seguranca
+- [DOCUMENTACAO_OPERACAO.md](DOCUMENTACAO_OPERACAO.md) — cron, workers, migracoes, `.env`
+- [DOCUMENTACAO_PRODUCAO.md](DOCUMENTACAO_PRODUCAO.md) — **deploy e go-live**
+- [DOCUMENTACAO_API_V1.md](DOCUMENTACAO_API_V1.md) — API REST, tokens, endpoints
+
+### Dominio de negocio
+- [DOCUMENTACAO_CONTAS_UTILIZADOR.md](DOCUMENTACAO_CONTAS_UTILIZADOR.md) — estados de conta, acesso limitado
+- [DOCUMENTACAO_IMOVEIS.md](DOCUMENTACAO_IMOVEIS.md) — ciclo de vida, moderacao, destaque
+- [DOCUMENTACAO_SOLICITACOES.md](DOCUMENTACAO_SOLICITACOES.md) — negociacao, chat, disputas
+- [DOCUMENTACAO_COMISSOES_PAGAMENTOS.md](DOCUMENTACAO_COMISSOES_PAGAMENTOS.md) — comissoes, hub de pagamentos
+- [REGULAMENTO_OPERACIONAL_COMISSOES.md](REGULAMENTO_OPERACIONAL_COMISSOES.md) — regras operacionais
+- [REQUESTS_FECHO_PAGAMENTO_ROADMAP.md](REQUESTS_FECHO_PAGAMENTO_ROADMAP.md) — matriz de estados de fecho
+
+### Experiencia e administracao
+- [DOCUMENTACAO_RANKING_COMPORTAMENTAL.md](DOCUMENTACAO_RANKING_COMPORTAMENTAL.md) — ranking comportamental
+- [DOCUMENTACAO_SEO.md](DOCUMENTACAO_SEO.md) — SEO e sitemap
+- [DOCUMENTACAO_ACESSOS_ADMIN.md](DOCUMENTACAO_ACESSOS_ADMIN.md) — perfis e permissoes admin
+- [NOTIFICACOES_OPERACIONAIS.md](NOTIFICACOES_OPERACIONAIS.md) — notificacoes de solicitacoes
+- [NOTIFICACOES_SISTEMA_COMPLETO.md](NOTIFICACOES_SISTEMA_COMPLETO.md) — API de notificacoes
 
 ## Funcionalidades
 
@@ -61,6 +80,23 @@ pwsh -File scripts/quality-check.ps1
 ### Logging técnico
 
 Erros não tratados são registados em `storage/logs/app.log` (JSON) com `request_id` (header `X-Request-Id`). Configure `LOG_CHANNEL=file` e `LOG_LEVEL=info` no `.env`.
+
+## Deploy em Produção
+
+```powershell
+# 1. Gerar pacote limpo (apenas essencial para o servidor)
+pwsh -File scripts/build-deploy-package.ps1
+
+# 2. Enviar a pasta deploy/ para a Hostinger (FTP)
+# 3. No servidor: copiar .env.production.example -> .env e preencher valores
+
+# Validacao local antes do upload:
+pwsh -File scripts/deploy-production.ps1
+```
+
+Tarefas agendadas no servidor: ver `scripts/*_scheduler.php` e `mail_queue_worker.php`.
+
+Guia completo: [DOCUMENTACAO_PRODUCAO.md](DOCUMENTACAO_PRODUCAO.md)
 
 ## Operação Rápida
 

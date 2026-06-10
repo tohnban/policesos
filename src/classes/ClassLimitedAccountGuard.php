@@ -70,15 +70,15 @@ class ClassLimitedAccountGuard
             return;
         }
 
-        if ($controller === 'ControllerProperty' && self::isPropertyReadRoute($url)) {
+        if (self::isPropertyController($controller) && self::isPropertyReadRoute($url)) {
             return;
         }
 
-        if ($controller === 'ControllerDashboard' && self::isAllowedDashboardRoute($url)) {
+        if (self::isDashboardController($controller) && self::isAllowedDashboardRoute($url)) {
             return;
         }
 
-        if ($controller === 'ControllerDashboard' && self::isAllowedProfileRoute($url)) {
+        if (self::isDashboardController($controller) && self::isAllowedProfileRoute($url)) {
             return;
         }
 
@@ -108,12 +108,12 @@ class ClassLimitedAccountGuard
     private static function isPropertyReadRoute(array $url): bool
     {
         $routeKey = strtolower((string) ($url[0] ?? ''));
-        if ($routeKey !== 'property' && $routeKey !== 'properties') {
-            return false;
+        if ($routeKey === 'properties' || $routeKey === 'featured') {
+            return true;
         }
 
-        if ($routeKey === 'properties') {
-            return true;
+        if ($routeKey !== 'property') {
+            return false;
         }
 
         $method = self::resolveUrlMethod($url[1] ?? '');
@@ -149,6 +149,16 @@ class ClassLimitedAccountGuard
         }
 
         return in_array($method, self::ALLOWED_DASHBOARD_METHODS, true);
+    }
+
+    private static function isDashboardController(string $controller): bool
+    {
+        return str_starts_with($controller, 'ControllerDashboard');
+    }
+
+    private static function isPropertyController(string $controller): bool
+    {
+        return $controller === 'ControllerProperty' || str_starts_with($controller, 'ControllerProperty');
     }
 
     private static function resolveUrlMethod(string $segment): string

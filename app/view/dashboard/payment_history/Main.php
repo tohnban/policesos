@@ -1,34 +1,39 @@
-<div class="dashboard-content-wrapper payment-transactions-view payment-history-dashboard-view">
-    <?php
-        $filterStatus = (string) ($filterStatus ?? '');
-        $filterType = (string) ($filterType ?? '');
-        $exportQuery = http_build_query([
-            'status' => $filterStatus,
-            'type' => $filterType,
-        ]);
+<?php
 
-        function paymentHistoryStatusChipClass(string $status): string {
-            return match ($status) {
-                'confirmado' => 'dashboard-chip-success',
-                'cancelado', 'rejeitado' => 'dashboard-chip-neutral',
-                'falhado' => 'dashboard-chip-danger',
-                default => 'dashboard-chip-warning',
-            };
-        }
-    ?>
-    <div class="dashboard-header">
-        <h1>Histórico de Pagamentos</h1>
-        <p>Consulte todas as transações de pagamento recebidas.</p>
-    </div>
+use Src\classes\FeedGrouping;
 
-    <div class="dashboard-card payment-transactions-card">
-        <div class="dashboard-card-title">
-            <h2>Minhas Transações</h2>
+$transactions = is_array($transactions ?? null) ? $transactions : [];
+$filterStatus = (string) ($filterStatus ?? '');
+$filterType = (string) ($filterType ?? '');
+$exportQuery = http_build_query([
+    'status' => $filterStatus,
+    'type' => $filterType,
+]);
+
+$transactionGroups = FeedGrouping::byRecency($transactions, 'created_at');
+$transactionTotal = count($transactions);
+?>
+
+<div class="container dashboard-view notification-inbox-view payment-account-feed-view payment-history-dashboard-view">
+    <section class="notification-inbox-hero">
+        <div class="notification-inbox-hero-main">
+            <h1>Movimentos da conta</h1>
+            <p class="notification-inbox-hero-meta">
+                <span><?php echo (int) $transactionTotal; ?> registo<?php echo $transactionTotal === 1 ? '' : 's'; ?></span>
+            </p>
         </div>
+        <div class="notification-inbox-hero-actions">
+            <a href="<?php echo DIRPAGE; ?>dashboard/exportPaymentHistoryPdf?<?php echo htmlspecialchars($exportQuery, ENT_QUOTES, 'UTF-8'); ?>"
+               class="notification-inbox-text-btn">Descarregar PDF</a>
+            <a href="<?php echo DIRPAGE; ?>dashboard/exportPaymentHistoryCsv?<?php echo htmlspecialchars($exportQuery, ENT_QUOTES, 'UTF-8'); ?>"
+               class="notification-inbox-text-btn notification-inbox-text-btn--muted">Descarregar CSV</a>
+        </div>
+    </section>
 
-        <form method="GET" action="<?php echo DIRPAGE; ?>dashboard/paymentHistory" class="dashboard-form payment-transactions-filters payment-history-filters filter-toolbar-form">
-            <div class="filter-toolbar filter-toolbar-sticky filter-toolbar-dashboard payment-history-actions">
-                <div class="filter-toolbar-inline-fields payment-history-filters-grid">
+    <div class="notification-inbox-panel payment-account-feed-panel">
+        <form method="GET" action="<?php echo DIRPAGE; ?>dashboard/paymentHistory" class="payment-account-feed-filters filter-toolbar-form">
+            <div class="filter-toolbar filter-toolbar-dashboard payment-account-feed-toolbar payment-account-feed-toolbar-padded">
+                <div class="filter-toolbar-inline-fields">
                     <div class="filter-toolbar-field">
                         <label class="filter-toolbar-field-label" for="history-status">Estado</label>
                         <select name="status" id="history-status" class="filter-toolbar-select">
@@ -55,74 +60,25 @@
                         </select>
                     </div>
                 </div>
-                <div class="filter-toolbar-actions payment-history-primary-actions">
-                    <button type="submit" class="dashboard-btn dashboard-btn-primary filter-toolbar-submit">Filtrar</button>
-                    <a href="<?php echo DIRPAGE; ?>dashboard/paymentHistory" class="dashboard-btn">Limpar</a>
-                </div>
-                <div class="payment-history-export-actions">
-                    <a href="<?php echo DIRPAGE; ?>dashboard/exportPaymentHistoryPdf?<?php echo htmlspecialchars($exportQuery); ?>" class="dashboard-btn dashboard-btn-small dashboard-btn-primary">
-                        <i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF
-                    </a>
-                    <a href="<?php echo DIRPAGE; ?>dashboard/exportPaymentHistoryCsv?<?php echo htmlspecialchars($exportQuery); ?>" class="dashboard-btn dashboard-btn-small dashboard-btn-primary">
-                        <i class="fa fa-download" aria-hidden="true"></i> CSV
-                    </a>
+                <div class="filter-toolbar-actions">
+                    <button type="submit" class="btn-primary filter-toolbar-submit">Filtrar</button>
+                    <a href="<?php echo DIRPAGE; ?>dashboard/paymentHistory" class="notification-inbox-text-btn notification-inbox-text-btn--muted">Limpar</a>
                 </div>
             </div>
         </form>
 
-        <?php if (!empty($transactions)): ?>
-            <div class="dashboard-table-wrap payment-transactions-table-wrap payment-history-table-wrap">
-            <table class="dashboard-table payment-transactions-table payment-history-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Tipo</th>
-                        <th>Montante</th>
-                        <th>Método</th>
-                        <th>Estado</th>
-                        <th>Referência</th>
-                        <th>Data</th>
-                        <th>Confirmada em</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($transactions as $tx): ?>
-                        <?php
-                            $typeLabel = [
-                                'commission_owner_payment' => 'Comissão (proprietário)',
-                                'commission_payout' => 'Pagamento ao afiliado',
-                                'system_commission' => 'Taxa sistema',
-                                'boost_fee' => 'Destaque',
-                                'trust_badge_fee' => 'Selo',
-                                'manual_adjustment' => 'Ajuste',
-                                'subscription_fee' => 'Subscrição',
-                            ][$tx['transaction_type']] ?? 'Outro';
-                            $statusLabel = ucfirst((string) ($tx['status'] ?? ''));
-                        ?>
-                        <tr class="payment-transactions-row payment-history-row">
-                            <td class="payment-transactions-id" data-label="ID">#<?php echo (int)$tx['id']; ?></td>
-                            <td data-label="Tipo">
-                                <span class="payment-transactions-type-pill"><?php echo htmlspecialchars((string) $typeLabel); ?></span>
-                            </td>
-                            <td class="dashboard-value" data-label="Montante">
-                                <strong><?php echo number_format((float)$tx['amount'], 2, ',', '.'); ?></strong> <?php echo htmlspecialchars($tx['currency']); ?>
-                            </td>
-                            <td class="dashboard-inline-note" data-label="Método"><?php echo htmlspecialchars($tx['method_name'] ?? 'N/A'); ?></td>
-                            <td data-label="Estado">
-                                <span class="dashboard-chip <?php echo paymentHistoryStatusChipClass((string) ($tx['status'] ?? '')); ?>">
-                                    <?php echo htmlspecialchars($statusLabel); ?>
-                                </span>
-                            </td>
-                            <td class="dashboard-inline-note" data-label="Referência"><?php echo htmlspecialchars($tx['reference_code'] ?? '–'); ?></td>
-                            <td data-label="Data"><?php echo date('d/m/Y H:i', strtotime($tx['created_at'])); ?></td>
-                            <td data-label="Confirmada"><?php echo $tx['confirmed_at'] ? date('d/m/Y H:i', strtotime($tx['confirmed_at'])) : '–'; ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-            </div>
-        <?php else: ?>
-            <p class="dashboard-empty-copy dashboard-empty-copy-spaced">Nenhuma transação registada.</p>
-        <?php endif; ?>
+        <?php
+            $shellHasItems = !empty($transactions);
+            $shellEmptyIcon = 'fa-credit-card';
+            $shellEmptyTitle = 'Ainda não há movimentos';
+            $shellEmptyMessage = empty($filterStatus) && empty($filterType)
+                ? 'Quando fizer ou receber pagamentos pela plataforma, o histórico aparece aqui.'
+                : 'Nenhum movimento corresponde aos filtros escolhidos. Tente outra combinação ou limpe os filtros.';
+            $feedGroups = $transactionGroups;
+            $shellFeedItemPartial = 'payment_transaction_feed_item.php';
+            $shellFeedItemVarName = 'transaction';
+            $shellFeedExtraClass = 'payment-account-feed';
+            require __DIR__ . '/../../partials/user_feed_shell.php';
+        ?>
     </div>
 </div>

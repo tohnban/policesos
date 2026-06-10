@@ -7,32 +7,10 @@ $registerErrorMessage = $registerErrorCode !== ''
     : null;
 ?>
 <section class="auth-shell auth-shell-register">
-    <div class="auth-shell-copy">
-        <span class="sales-kicker">Nova conta</span>
-        <h1>Crie a sua conta e comece a explorar imóveis verificados.</h1>
-        <p>Registe-se para pesquisar imóveis, entrar em contacto com proprietários e acompanhar as suas solicitações.</p>
-
-        <div class="auth-shell-highlights">
-            <article>
-                <strong>Conta segura</strong>
-                <span>Perfil verificado — os proprietários sabem com quem falam.</span>
-            </article>
-            <article>
-                <strong>Identificação</strong>
-                <span>BI ou NIF e documento para aprovarmos o seu registo.</span>
-            </article>
-            <article>
-                <strong>Comece hoje</strong>
-                <span>Explore imóveis enquanto a conta é analisada.</span>
-            </article>
-        </div>
-    </div>
-
     <div class="auth-container auth-panel-card auth-register-panel">
         <div class="auth-panel-head">
             <span class="sales-kicker">Registo</span>
             <h2>Registar na Imobil Fácil</h2>
-            <p>Dois passos. Campos com * são obrigatórios.</p>
         </div>
 
         <?php if ($registerErrorMessage !== null): ?>
@@ -47,7 +25,6 @@ $registerErrorMessage = $registerErrorCode !== ''
                     <span class="auth-form-block-step" aria-hidden="true">1</span>
                     <div>
                         <h3 class="auth-form-block-title" id="register-step-one-title">Dados e identificação</h3>
-                        <p class="auth-form-block-lead">Nome, documento e foto opcional. O nome de utilizador (@…) é criado automaticamente a partir do nome indicado.</p>
                     </div>
                 </header>
                 <div class="auth-form-block-body">
@@ -78,11 +55,11 @@ $registerErrorMessage = $registerErrorCode !== ''
                                 <option value="pessoa_fisica">Pessoa física</option>
                                 <option value="pessoa_juridica">Pessoa jurídica</option>
                             </select>
-                            <small class="auth-helper-text">Física: BI/NIF 14 dígitos · Jurídica: NIF 10 dígitos.</small>
+                            <small class="auth-helper-text">Física: BI ou NIF (letras e números) · Jurídica: NIF 10 dígitos.</small>
                         </div>
                         <div class="form-group" id="document_group">
                             <label for="document_number" id="document_label">Número de identificação *</label>
-                            <input type="text" id="document_number" name="document_number" placeholder="Seleccione o tipo acima" inputmode="numeric" autocomplete="off" disabled>
+                            <input type="text" id="document_number" name="document_number" placeholder="Seleccione o tipo acima" autocomplete="off" disabled>
                             <small id="document_hint" class="auth-helper-text">Escolha o tipo de conta para ver o formato.</small>
                         </div>
                         <div class="form-group auth-register-doc-upload" id="document_upload_group">
@@ -130,24 +107,91 @@ $registerErrorMessage = $registerErrorCode !== ''
                     </div>
                 </div>
 
-                <div class="auth-register-affiliate">
-                    <label class="checkbox-label auth-checkbox-card">
-                        <input type="checkbox" name="affiliate_interest" value="1">
-                        <span class="auth-checkbox-text">
-                            Interesse em ser parceiro/afiliado
-                            <small class="auth-checkbox-note">Activável no painel após aprovação da conta.</small>
+                <div class="auth-register-agreements auth-form-span-full" aria-labelledby="register-agreements-title">
+                    <header class="auth-register-agreements-head">
+                        <span class="auth-register-agreements-icon" aria-hidden="true">
+                            <i class="fa fa-check-square-o"></i>
                         </span>
-                    </label>
+                        <div>
+                            <h4 class="auth-register-agreements-title" id="register-agreements-title">Confirmações finais</h4>
+                            <p class="auth-register-agreements-lead">Revise e aceite para concluir o registo.</p>
+                        </div>
+                    </header>
+
+                    <div class="auth-agreement-list">
+                        <label class="auth-agreement-card auth-agreement-card--optional">
+                            <input type="checkbox" name="affiliate_interest" value="1" class="auth-agreement-input">
+                            <span class="auth-agreement-control" aria-hidden="true"></span>
+                            <span class="auth-agreement-body">
+                                <span class="auth-agreement-title">
+                                    Interesse em ser parceiro/afiliado
+                                    <span class="auth-agreement-badge auth-agreement-badge--optional">Opcional</span>
+                                </span>
+                                <span class="auth-agreement-note">Pode activar no painel após aprovação da conta.</span>
+                            </span>
+                        </label>
+
+                        <label class="auth-agreement-card auth-agreement-card--required" id="accept_terms_card">
+                            <input type="checkbox" name="accept_terms" id="accept_terms" value="1" class="auth-agreement-input" required>
+                            <span class="auth-agreement-control" aria-hidden="true"></span>
+                            <span class="auth-agreement-body">
+                                <span class="auth-agreement-title">
+                                    Aceito os termos legais da plataforma
+                                    <span class="auth-agreement-badge auth-agreement-badge--required">Obrigatório</span>
+                                </span>
+                                <span class="auth-agreement-note">
+                                    <span class="auth-agreement-note-text">Declaro que li e aceito:</span>
+                                    <span class="auth-agreement-links">
+                                        <a href="<?php echo DIRPAGE; ?>termos" target="_blank" rel="noopener noreferrer" class="auth-agreement-link">
+                                            Termos e Condições <i class="fa fa-external-link" aria-hidden="true"></i>
+                                        </a>
+                                        <a href="<?php echo DIRPAGE; ?>privacidade" target="_blank" rel="noopener noreferrer" class="auth-agreement-link">
+                                            Política de Privacidade <i class="fa fa-external-link" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </span>
+                            </span>
+                        </label>
+                    </div>
                 </div>
 
-                <div class="auth-register-submit">
-                    <button type="submit" class="auth-register-submit-btn">Criar minha conta grátis</button>
+                <div class="auth-register-submit auth-form-span-full" id="registerSubmitWrap">
+                    <p class="auth-register-submit-hint auth-register-submit-hint--wait" id="register-submit-hint" aria-live="polite">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        Marque a aceitação dos termos para activar o botão de registo.
+                    </p>
+                    <p class="auth-register-submit-hint auth-register-submit-hint--ok" hidden>
+                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                        Confirmações aceites — pode concluir o registo.
+                    </p>
+                    <button type="submit" class="auth-register-submit-btn" id="registerSubmitBtn">Criar minha conta grátis</button>
                 </div>
             </section>
         </form>
 
         <div class="auth-footer">
             <p>Já tem conta? <a href="<?php echo DIRPAGE; ?>login">Faça login</a></p>
+        </div>
+    </div>
+
+    <div class="auth-shell-copy auth-shell-copy-register">
+        <span class="sales-kicker">Nova conta</span>
+        <h1>Crie a sua conta e comece a explorar imóveis verificados.</h1>
+        <p>Registe-se para pesquisar imóveis, entrar em contacto com proprietários e acompanhar as suas solicitações.</p>
+
+        <div class="auth-shell-highlights">
+            <article>
+                <strong>Conta segura</strong>
+                <span>Perfil verificado — os proprietários sabem com quem falam.</span>
+            </article>
+            <article>
+                <strong>Identificação</strong>
+                <span>BI ou NIF e documento para aprovarmos o seu registo.</span>
+            </article>
+            <article>
+                <strong>Comece hoje</strong>
+                <span>Explore imóveis enquanto a conta é analisada.</span>
+            </article>
         </div>
     </div>
 </section>

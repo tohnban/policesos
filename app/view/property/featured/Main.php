@@ -79,17 +79,6 @@ $formatPurpose = static function (?string $value) use ($purposeLabels): string {
             ? 'A grelha abaixo varia conforme o seu histórico — menos repetição, mais relevância.'
             : ($totalFeatured > 0 ? 'Os mais bem apresentados neste momento — prontos para visita e negociação.' : 'Nenhum imóvel com destaque neste momento.'); ?></span>
     </div>
-    <?php if ($totalPages > 1): ?>
-        <div class="sales-pagination-inline">
-            <span>Pagina <?php echo $page; ?> de <?php echo $totalPages; ?></span>
-            <?php if ($page > 1): ?>
-                <a href="<?php echo htmlspecialchars($buildPageUrl($page - 1)); ?>" class="btn-secondary">&larr; Anterior</a>
-            <?php endif; ?>
-            <?php if ($page < $totalPages): ?>
-                <a href="<?php echo htmlspecialchars($buildPageUrl($page + 1)); ?>" class="btn-secondary">Proxima &rarr;</a>
-            <?php endif; ?>
-        </div>
-    <?php endif; ?>
 </section>
 
 <section class="container featured-intro-band">
@@ -123,9 +112,9 @@ $formatPurpose = static function (?string $value) use ($purposeLabels): string {
         <?php else: ?>
             <div class="sales-empty-state">
                 <i class="fa fa-star-o"></i>
-                <h3>Sem imoveis em destaque agora</h3>
-                <p>Enquanto isso, explore todos os imoveis disponiveis e ative alertas.</p>
-                <a href="<?php echo DIRPAGE; ?>properties" class="btn-primary">Ir para todos os imoveis</a>
+                <h3>Sem imóveis em destaque agora</h3>
+                <p>Enquanto isso, explore todos os imóveis disponíveis e ative alertas.</p>
+                <a href="<?php echo DIRPAGE; ?>properties" class="btn-primary">Ir para todos os imóveis</a>
             </div>
         <?php endif; ?>
     </div>
@@ -137,9 +126,9 @@ $formatPurpose = static function (?string $value) use ($purposeLabels): string {
         <?php if ($page > 1): ?>
             <a href="<?php echo htmlspecialchars($buildPageUrl($page - 1)); ?>" class="btn-secondary">&larr; Anterior</a>
         <?php endif; ?>
-        <span>Pagina <?php echo $page; ?> de <?php echo $totalPages; ?></span>
+        <span>Página <?php echo $page; ?> de <?php echo $totalPages; ?></span>
         <?php if ($page < $totalPages): ?>
-            <a href="<?php echo htmlspecialchars($buildPageUrl($page + 1)); ?>" class="btn-secondary">Proxima &rarr;</a>
+            <a href="<?php echo htmlspecialchars($buildPageUrl($page + 1)); ?>" class="btn-secondary">Próxima &rarr;</a>
         <?php endif; ?>
     </div>
 </section>

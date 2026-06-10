@@ -9,7 +9,7 @@ class ClassTrustBadgeGuard
 {
     public static function enforce(string $controller, array $url): void
     {
-        if ($controller !== 'ControllerDashboard') {
+        if (!str_starts_with($controller, 'ControllerDashboard')) {
             return;
         }
 

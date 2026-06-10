@@ -80,6 +80,15 @@ class ClassMailer
         return self::send($toEmail, $toName, $subject, $htmlBody, $textBody);
     }
 
+    /**
+     * Emails críticos de autenticação (verificação de conta, recuperação de senha).
+     * Envia de imediato — não dependem do mail_queue_worker.
+     */
+    public static function sendTransactional(string $toEmail, string $toName, string $subject, string $htmlBody, string $textBody = ''): bool
+    {
+        return self::send($toEmail, $toName, $subject, $htmlBody, $textBody);
+    }
+
     public static function sendNotification(string $toEmail, string $toName, string $title, string $message): bool
     {
         $subject = '[Imobil] ' . $title;
